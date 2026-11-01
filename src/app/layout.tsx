@@ -18,6 +18,8 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import SmoothScroll from "@/components/SmoothScroll";
 import MobileBottomBar from "@/components/mobile/MobileBottomBar";
+import AccountSync from "@/components/AccountSync";
+import RouteTransition from "@/components/RouteTransition";
 
 export const metadata: Metadata = {
   title: "NOVARIX | Premium E-Commerce",
@@ -40,10 +42,11 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <AccountSync />
           <Navbar />
           <SmoothScroll>
             <main className="flex-1 flex flex-col w-full h-full">
-              {children}
+              <RouteTransition>{children}</RouteTransition>
             </main>
           </SmoothScroll>
           <MobileBottomBar />

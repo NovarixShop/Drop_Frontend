@@ -2,32 +2,32 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useGamificationStore } from "@/store/gamificationStore";
-
-const PRIZES = [
-  "10% OFF",
-  "Try Again",
-  "Free Shipping",
-  "20% OFF",
-  "Try Again",
-  "Free Gift",
-];
+import { toast } from "sonner";
+import { useGamificationStore, PlayResult, SPIN_SEGMENTS as PRIZES } from "@/store/gamificationStore";
+import { getErrorMessage } from "@/lib/api";
 
 export function SpinningWheel() {
   const [isSpinning, setIsSpinning] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
+  const [result, setResult] = useState<PlayResult | null>(null);
   const [rotationAngle, setRotationAngle] = useState(0);
-  const { spinsAvailable, useSpin: consumeSpin, claimCoupon } = useGamificationStore();
+  const { spinsAvailable, spin, fetchRewards } = useGamificationStore();
 
-  const handleSpin = () => {
+  const handleSpin = async () => {
     if (spinsAvailable <= 0 || isSpinning) return;
     
     setIsSpinning(true);
     setResult(null);
-    consumeSpin();
 
-    // Random prize index (0 to PRIZES.length - 1)
-    const prizeIndex = Math.floor(Math.random() * PRIZES.length);
+    // The server draws the prize and issues the coupon; the wheel just animates to it
+    let played: PlayResult;
+    try {
+      played = await spin();
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Couldn't spin the wheel. Please try again."));
+      setIsSpinning(false);
+      return;
+    }
+    const prizeIndex = played.segmentIndex;
     
     // Each slice is 360 / PRIZES.length degrees
     const sliceAngle = 360 / PRIZES.length;
@@ -48,20 +48,16 @@ export function SpinningWheel() {
 
     // Wait for the CSS transition (4s) to finish
     setTimeout(() => {
-      const wonPrize = PRIZES[prizeIndex];
-      setResult(wonPrize);
+      setResult(played);
       setIsSpinning(false);
-
-      if (wonPrize !== "Try Again") {
-        claimCoupon(wonPrize);
-      }
+      fetchRewards().catch(() => {});
     }, 4000);
   };
 
   return (
     <div className="flex flex-col items-center w-full min-w-[300px] max-w-[384px] mx-auto text-center">
       <p className="font-label-md text-primary mb-8 tracking-widest uppercase w-full text-center whitespace-nowrap">
-        {spinsAvailable} spin{spinsAvailable !== 1 ? 's' : ''} left
+        {spinsAvailable > 0 ? "Your daily spin is ready" : "Come back tomorrow for your next spin"}
       </p>
       
       <div className="relative w-64 h-64 mb-10">
@@ -116,8 +112,13 @@ export function SpinningWheel() {
           className="mt-6 text-center"
         >
           <p className="font-label-md text-primary">
-            {result === "Try Again" ? "Oops! Better luck next time." : `🎉 You won: ${result}!`}
+            {result.coupon ? `🎉 You won: ${result.prize}!` : "Oops! Better luck next time."}
           </p>
+          {result.coupon && (
+            <p className="mt-2 font-caption text-on-surface-variant">
+              Your code <span className="font-bold text-on-surface">{result.coupon.code}</span> is saved below.
+            </p>
+          )}
         </motion.div>
       )}
     </div>

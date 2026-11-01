@@ -2,6 +2,10 @@ import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
+// Extract the server's error message from an API failure, falling back to a default
+export const getErrorMessage = (err: unknown, fallback: string): string =>
+  (axios.isAxiosError(err) && err.response?.data?.message) || fallback;
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -21,7 +25,7 @@ api.interceptors.request.use(
                 if (parsed.state && parsed.state.accessToken) {
                     config.headers.Authorization = `Bearer ${parsed.state.accessToken}`;
                 }
-            } catch (e) {}
+            } catch {}
         }
     }
     return config;
@@ -31,9 +35,9 @@ api.interceptors.request.use(
 
 // Response Interceptor for handling 401s and refreshing tokens
 let isRefreshing = false;
-let failedQueue: { resolve: (value?: unknown) => void, reject: (reason?: any) => void }[] = [];
+let failedQueue: { resolve: (value?: unknown) => void, reject: (reason?: unknown) => void }[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach(prom => {
     if (error) {
       prom.reject(error);
@@ -80,7 +84,7 @@ api.interceptors.response.use(
                      const parsed = JSON.parse(authData);
                      parsed.state.accessToken = newAccessToken;
                      localStorage.setItem('auth-storage', JSON.stringify(parsed));
-                 } catch (e) {}
+                 } catch {}
              }
           }
           
@@ -90,6 +94,8 @@ api.interceptors.response.use(
           processQueue(null, newAccessToken);
           return api(originalRequest);
         }
+        // Refresh responded without a token: treat as a failed refresh
+        throw error;
       } catch (err) {
         processQueue(err, null);
         // If refresh fails (e.g. token expired), we could trigger a logout action here
@@ -103,7 +109,7 @@ api.interceptors.response.use(
                      parsed.state.user = null;
                      localStorage.setItem('auth-storage', JSON.stringify(parsed));
                      window.location.href = '/login';
-                 } catch (e) {}
+                 } catch {}
             }
         }
         return Promise.reject(err);

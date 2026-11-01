@@ -5,9 +5,15 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { motion } from 'framer-motion';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import api from '@/lib/api'; // assuming api is in lib
 import { toast } from 'sonner';
+
+// Where to go after signing in: the ?redirect= path if it stays on this site, otherwise home
+const getRedirectPath = (): string => {
+  const redirect = new URLSearchParams(window.location.search).get('redirect');
+  return redirect && redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/';
+};
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -21,13 +27,13 @@ export default function LoginPage() {
     clearError();
     try {
       await login(email, password);
-      router.push('/');
-    } catch (err) {
+      router.push(getRedirectPath());
+    } catch {
       // Error is handled in the store
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     try {
       const res = await api.post('/auth/google-login', {
         idToken: credentialResponse.credential,
@@ -41,8 +47,8 @@ export default function LoginPage() {
       });
       
       toast.success('Successfully logged in with Google');
-      router.push('/');
-    } catch (err: any) {
+      router.push(getRedirectPath());
+    } catch (err) {
       console.error('Google login failed:', err);
       toast.error('Google login failed. Please try again.');
     }

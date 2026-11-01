@@ -134,7 +134,7 @@ export default function WishlistPage() {
               </div>
             </div>
             <h3 className="font-headline-lg mb-3 text-on-surface text-3xl font-bold">Your wishlist is empty</h3>
-            <p className="text-on-surface-variant max-w-[420px] mx-auto mb-10 font-body-md text-lg">Save items you love to your wishlist. Review them anytime and easily move them to your cart when you're ready.</p>
+            <p className="text-on-surface-variant max-w-[420px] mx-auto mb-10 font-body-md text-lg">Save items you love to your wishlist. Review them anytime and easily move them to your cart when you&apos;re ready.</p>
             <Link 
               href="/products"
               className="px-8 py-4 bg-primary text-on-primary font-label-lg rounded-full hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20 hover:shadow-primary/40 flex items-center gap-3"

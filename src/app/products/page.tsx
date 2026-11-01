@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useProductStore } from '@/store/productStore';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
-import { ShoppingCart, Heart, Filter, X, SearchX } from 'lucide-react';
+import { Heart, Filter, X, SearchX } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import ProductSkeleton from '@/components/products/ProductSkeleton';

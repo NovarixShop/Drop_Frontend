@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
 import { useGamificationStore } from "@/store/gamificationStore";
-import { useState } from "react";
+import { useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -12,31 +12,17 @@ import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getTotal } = useCartStore();
-  const { couponsClaimed } = useGamificationStore();
+  const { coupons, fetchRewards } = useGamificationStore();
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
-  const [couponInput, setCouponInput] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const availableCoupons = coupons.filter((c) => c.status === "available");
 
+  // Coupons are applied by the server at checkout, so the cart only shows the subtotal
   const subtotal = getTotal();
-  
-  // Simple discount logic based on mocked prizes
-  let discount = 0;
-  if (appliedCoupon === "10% OFF") discount = subtotal * 0.1;
-  if (appliedCoupon === "20% OFF") discount = subtotal * 0.2;
-  if (appliedCoupon === "15% OFF") discount = subtotal * 0.15;
-  if (appliedCoupon === "₹500 OFF") discount = 500;
 
-  const total = Math.max(0, subtotal - discount);
-
-  const handleApplyCoupon = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (couponsClaimed.includes(couponInput)) {
-      setAppliedCoupon(couponInput);
-    } else {
-      alert("Invalid or unearned coupon code.");
-    }
-  };
+  useEffect(() => {
+    if (isAuthenticated) fetchRewards().catch(() => {});
+  }, [isAuthenticated, fetchRewards]);
 
   return (
     <div className="min-h-[calc(100vh-4rem)] pt-12 pb-24 px-4 bg-zinc-50 dark:bg-black">
@@ -123,55 +109,35 @@ export default function CartPage() {
               
               <div className="space-y-4 mb-6 text-gray-600 dark:text-gray-300">
                 <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span className="font-medium text-black dark:text-white">₹{subtotal.toFixed(2)}</span>
-                </div>
-                
-                {discount > 0 && (
-                  <div className="flex justify-between text-green-600 dark:text-green-400 font-medium">
-                    <span>Discount ({appliedCoupon})</span>
-                    <span>-₹{discount.toFixed(2)}</span>
-                  </div>
-                )}
-                
-                <div className="flex justify-between">
-                  <span>Shipping</span>
+                  <span>Discounts, tax & shipping</span>
                   <span>Calculated at checkout</span>
                 </div>
               </div>
 
               <div className="border-t border-gray-100 dark:border-white/10 pt-4 mb-8">
                 <div className="flex justify-between items-center text-xl font-bold text-black dark:text-white">
-                  <span>Total</span>
-                  <span>₹{total.toFixed(2)}</span>
+                  <span>Subtotal</span>
+                  <span>₹{subtotal.toFixed(2)}</span>
                 </div>
               </div>
 
-              <form onSubmit={handleApplyCoupon} className="mb-8">
-                <label className="block text-sm font-medium mb-2 text-gray-600 dark:text-gray-300">
-                  Have a gamification coupon?
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value)}
-                    placeholder="E.g. 10% OFF"
-                    className="flex-1 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:border-accent transition-colors"
-                  />
-                  <button 
-                    type="submit"
-                    className="bg-black dark:bg-white text-white dark:text-black px-6 py-3 rounded-xl font-medium hover:opacity-80 transition-opacity"
-                  >
-                    Apply
-                  </button>
-                </div>
-                {couponsClaimed.length > 0 && (
-                  <p className="text-xs text-gray-400 mt-2">
-                    Your available coupons: {couponsClaimed.join(", ")}
+              {availableCoupons.length > 0 && (
+                <div className="mb-8">
+                  <p className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-300">
+                    Your reward coupons (apply at checkout)
                   </p>
-                )}
-              </form>
+                  <div className="flex flex-wrap gap-2">
+                    {availableCoupons.map((c) => (
+                      <span
+                        key={c.code}
+                        className="text-xs font-medium bg-gray-100 dark:bg-zinc-800 border border-dashed border-gray-300 dark:border-zinc-600 rounded-lg px-2.5 py-1"
+                      >
+                        {c.label} · {c.code}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <button 
                 onClick={() => {

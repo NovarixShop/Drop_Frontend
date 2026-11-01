@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/store/cartStore';
 import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';

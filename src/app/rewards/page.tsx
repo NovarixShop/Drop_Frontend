@@ -4,38 +4,39 @@ import { motion } from 'framer-motion';
 import { SpinningWheel } from '@/components/gamification/SpinningWheel';
 import { ScratchCard } from '@/components/gamification/ScratchCard';
 import { useGamificationStore } from '@/store/gamificationStore';
-import { Sparkles, Ticket, Lock } from 'lucide-react';
+import { Sparkles, Ticket, Lock, Copy } from 'lucide-react';
 import { TiltCard } from '@/components/3DCard';
-import { useEffect, useState } from 'react';
-import api from '@/lib/api';
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { toast } from 'sonner';
 import { useAuthStore } from '@/store/authStore';
 
+const STATUS_LABEL = { available: 'Ready to use at checkout', used: 'Used', expired: 'Expired' } as const;
+
 export default function RewardsPage() {
-  const { spinsAvailable, couponsClaimed } = useGamificationStore();
+  const { coupons, hasPurchased, loaded, fetchRewards } = useGamificationStore();
   const { isAuthenticated } = useAuthStore();
-  const [hasPurchased, setHasPurchased] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const loading = isAuthenticated && !loaded;
 
   useEffect(() => {
-    const checkPurchases = async () => {
-      if (!isAuthenticated) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const res = await api.get('/orders/history');
-        if (res.data.data.orders && res.data.data.orders.length > 0) {
-          setHasPurchased(true);
-        }
-      } catch (error) {
-        console.error('Failed to check purchases:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    checkPurchases();
-  }, [isAuthenticated]);
+    if (isAuthenticated) {
+      fetchRewards().catch((error) => console.error('Failed to load rewards:', error));
+    }
+  }, [isAuthenticated, fetchRewards]);
+
+  const copyCode = (code: string) => {
+    navigator.clipboard?.writeText(code).then(
+      () => toast.success(`Copied ${code}`),
+      () => toast.error('Could not copy the code')
+    );
+  };
+
+  const lockTitle = !isAuthenticated ? 'Sign in to play' : null;
+  const lockMessage = !isAuthenticated ? (
+    <>
+      <Link href="/login?redirect=/rewards" className="text-primary hover:underline">Sign in</Link> to see your rewards.
+    </>
+  ) : null;
 
   return (
     <div className="bg-surface min-h-screen pt-24 md:pt-12 pb-40">
@@ -90,8 +91,8 @@ export default function RewardsPage() {
             {(!hasPurchased || loading) && (
               <div className="absolute inset-0 bg-surface/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center text-center p-6">
                 <Lock className="w-12 h-12 text-on-surface-variant mb-4" />
-                <h3 className="font-headline-md text-xl mb-2">Unlock Rewards</h3>
-                <p className="text-on-surface-variant text-sm">Make your first purchase to unlock the Daily Spin and Mystery Cards.</p>
+                <h3 className="font-headline-md text-xl mb-2">{lockTitle ?? 'Unlock Rewards'}</h3>
+                <p className="text-on-surface-variant text-sm">{lockMessage ?? 'Make your first purchase to unlock the Daily Spin and Mystery Cards.'}</p>
               </div>
             )}
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
@@ -118,8 +119,8 @@ export default function RewardsPage() {
             {(!hasPurchased || loading) && (
               <div className="absolute inset-0 bg-surface/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center text-center p-6">
                 <Lock className="w-12 h-12 text-on-surface-variant mb-4" />
-                <h3 className="font-headline-md text-xl mb-2">Unlock Mystery Card</h3>
-                <p className="text-on-surface-variant text-sm">Make a purchase to unlock scratch cards with hidden offers.</p>
+                <h3 className="font-headline-md text-xl mb-2">{lockTitle ?? 'Unlock Mystery Card'}</h3>
+                <p className="text-on-surface-variant text-sm">{lockMessage ?? 'Make a purchase to unlock scratch cards with hidden offers.'}</p>
               </div>
             )}
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-bl from-primary/5 to-transparent pointer-events-none"></div>
@@ -129,7 +130,7 @@ export default function RewardsPage() {
               </div>
               <h2 className="font-headline-lg text-on-surface mb-2 md:mb-3 text-2xl md:text-3xl">Mystery Card</h2>
               <p className="font-body-md text-on-surface-variant text-sm md:text-base">
-                Scratch to reveal hidden offers. Available once per purchase event.
+                Scratch to reveal hidden offers. You earn one card with every order.
               </p>
             </div>
             
@@ -157,20 +158,34 @@ export default function RewardsPage() {
             <div className="h-[1px] w-full bg-outline-variant/30 hidden md:block"></div>
           </div>
           
-          {couponsClaimed && couponsClaimed.length > 0 ? (
+          {coupons.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-              {couponsClaimed.map((coupon, idx) => (
+              {coupons.map((coupon, idx) => (
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1, type: "spring", stiffness: 200 }}
-                  key={idx} 
-                  className="bg-surface border border-outline-variant/50 rounded-2xl p-6 md:p-8 text-center shadow-sm relative overflow-hidden group hover:border-primary/50 transition-colors"
+                  key={coupon.code} 
+                  className={`bg-surface border border-outline-variant/50 rounded-2xl p-6 md:p-8 text-center shadow-sm relative overflow-hidden group hover:border-primary/50 transition-colors ${coupon.status !== 'available' ? 'opacity-50' : ''}`}
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container transform origin-left scale-x-100 group-hover:scale-x-0 transition-transform duration-500"></div>
-                  <h3 className="font-headline-lg text-primary mb-2 font-bold text-xl md:text-2xl">{coupon}</h3>
-                  <p className="font-caption text-on-surface-variant text-[12px] md:text-[13px] uppercase tracking-wider">Ready to use at checkout</p>
+                  <h3 className="font-headline-lg text-primary mb-2 font-bold text-xl md:text-2xl">{coupon.label}</h3>
+                  <button
+                    onClick={() => copyCode(coupon.code)}
+                    disabled={coupon.status !== 'available'}
+                    className="inline-flex items-center gap-2 font-label-md text-on-surface bg-surface-container-low border border-dashed border-outline-variant rounded-lg px-3 py-1.5 mb-3 hover:border-primary transition-colors"
+                    title="Copy code"
+                  >
+                    {coupon.code} {coupon.status === 'available' && <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                  <p className="font-caption text-on-surface-variant text-[12px] md:text-[13px] uppercase tracking-wider">{STATUS_LABEL[coupon.status]}</p>
+                  {coupon.status === 'available' && (
+                    <p className="font-caption text-on-surface-variant text-[12px] mt-1">
+                      {coupon.minOrderValue > 0 && `Min. order ₹${coupon.minOrderValue} · `}
+                      Expires {new Date(coupon.expiryDate).toLocaleDateString()}
+                    </p>
+                  )}
                 </motion.div>
               ))}
             </div>

@@ -9,8 +9,6 @@ import { ShoppingCart, LogOut, Search, Heart, User } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import Image from 'next/image';
-import { toast } from 'sonner';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -93,9 +91,14 @@ export default function Navbar() {
           
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full overflow-hidden border border-outline-variant bg-primary-container flex items-center justify-center">
+              <Link
+                href="/orders"
+                title="My Orders"
+                aria-label="My Orders"
+                className="w-8 h-8 rounded-full overflow-hidden border border-outline-variant bg-primary-container flex items-center justify-center hover:ring-2 hover:ring-primary transition-all"
+              >
                 <span className="text-on-primary-container font-label-md">{user?.name?.charAt(0).toUpperCase()}</span>
-              </div>
+              </Link>
               <button 
                 onClick={() => logout()}
                 className="text-on-surface-variant hover:text-primary transition-colors"

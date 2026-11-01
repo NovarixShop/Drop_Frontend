@@ -5,10 +5,28 @@ import { motion } from "framer-motion";
 import { api } from "@/lib/api";
 import { CountdownTimer } from "@/components/deals/CountdownTimer";
 import Link from "next/link";
-import Image from "next/image";
+
+interface DealProduct {
+  _id: string;
+  name: string;
+  slug: string;
+  price: number;
+  compareAtPrice?: number;
+  images?: string[];
+}
+
+interface Deal {
+  _id: string;
+  name: string;
+  description?: string;
+  discountPercentage: number;
+  startTime: string;
+  endTime: string;
+  products?: DealProduct[];
+}
 
 export default function DealsPage() {
-  const [deals, setDeals] = useState<any[]>([]);
+  const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -58,7 +76,7 @@ export default function DealsPage() {
       >
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-accent">Exclusive Deals</h1>
         <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-          Don't miss out on these limited-time offers!
+          Don&apos;t miss out on these limited-time offers!
         </p>
       </motion.div>
 
@@ -95,9 +113,10 @@ export default function DealsPage() {
                 </div>
 
                 <div className="mt-8 mb-8 space-y-4">
-                  {deal.products && deal.products.map((prod: any) => (
+                  {deal.products && deal.products.map((prod) => (
                     <div key={prod._id} className="flex items-center gap-4 bg-gray-800/50 p-4 rounded-xl">
                       {prod.images && prod.images[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img src={prod.images[0]} alt={prod.name} className="w-16 h-16 object-cover rounded-lg" />
                       ) : (
                         <div className="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center">

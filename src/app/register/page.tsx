@@ -25,7 +25,7 @@ export default function RegisterPage() {
       setTimeout(() => {
         router.push('/login');
       }, 3000);
-    } catch (err) {
+    } catch {
       // Error handled in store
     }
   };
