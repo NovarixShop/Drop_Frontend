@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Heart, Minus, Plus, Star, ArrowLeft, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
 import { api, getErrorMessage } from "@/lib/api";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { useAuthStore } from "@/store/authStore";
+import ProductGallery from "@/components/products/ProductGallery";
+import SimilarProducts from "@/components/products/SimilarProducts";
 
 interface ProductDetail {
   _id: string;
@@ -54,8 +56,8 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-  const [activeImage, setActiveImage] = useState(0);
+  const [loadError, setLoadError] = useState<"notFound" | "unreachable" | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -65,18 +67,27 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     const fetchProduct = async () => {
+      // Reset per-product state: this page can switch products in place (e.g. via "Similar products")
       setLoading(true);
+      setLoadError(null);
+      setQuantity(1);
+      setReviews([]);
       try {
-        const res = await api.get(`/products/slug/${slug}`);
+        const res = await api.get(`/products/slug/${encodeURIComponent(slug)}`);
         setProduct(res.data.data.product);
-      } catch {
-        setNotFound(true);
+      } catch (err) {
+        // Only a 404 means this product genuinely isn't in the catalogue. Anything else
+        // (API not running, wrong NEXT_PUBLIC_API_URL, CORS, 5xx) is an infrastructure
+        // fault, and reporting it as "Product not found" hides the real cause.
+        setLoadError(
+          axios.isAxiosError(err) && err.response?.status === 404 ? "notFound" : "unreachable"
+        );
       } finally {
         setLoading(false);
       }
     };
     fetchProduct();
-  }, [slug]);
+  }, [slug, reloadKey]);
 
   useEffect(() => {
     if (!product) return;
@@ -99,14 +110,38 @@ export default function ProductDetailPage() {
     );
   }
 
-  if (notFound || !product) {
+  if (!product) {
+    const unreachable = loadError === "unreachable";
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-        <h1 className="text-3xl font-bold mb-4">Product not found</h1>
-        <p className="text-on-surface-variant mb-8">It may have been removed or is no longer available.</p>
-        <Link href="/products" className="bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md">
-          Back to Products
-        </Link>
+      <div className="min-h-[60svh] flex flex-col items-center justify-center text-center px-4">
+        <h1 className="font-headline-xl text-on-surface mb-4">
+          {unreachable ? "We can\u2019t load this product right now" : "Product not found"}
+        </h1>
+        <p className="text-on-surface-variant font-body-md mb-8 max-w-md text-balance">
+          {unreachable
+            ? "The store couldn\u2019t reach our catalogue service. Check your connection and try again."
+            : "It may have been removed or is no longer available."}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3">
+          {unreachable && (
+            <button
+              onClick={() => setReloadKey((n) => n + 1)}
+              className="bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md transition-opacity hover:opacity-90 active:scale-95"
+            >
+              Try again
+            </button>
+          )}
+          <Link
+            href="/products"
+            className={`px-6 py-3 rounded-xl font-label-md transition-colors ${
+              unreachable
+                ? "border border-outline-variant text-on-surface hover:border-primary hover:text-primary"
+                : "bg-primary text-on-primary"
+            }`}
+          >
+            Back to Products
+          </Link>
+        </div>
       </div>
     );
   }
@@ -115,6 +150,7 @@ export default function ProductDetailPage() {
   const maxAddable = Math.max(product.stock - inCart, 0);
   const wishlisted = isInWishlist(product._id);
   const categoryName = typeof product.category === "object" ? product.category.name : null;
+  const categorySlug = typeof product.category === "object" ? product.category.slug : null;
 
   const handleAddToCart = () => {
     if (maxAddable < 1) return;
@@ -174,37 +210,8 @@ export default function ProductDetailPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Gallery */}
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-          <div className="aspect-[4/5] relative overflow-hidden bg-surface-container-low rounded-2xl soft-shadow mb-4">
-            {product.images?.length > 0 ? (
-              <Image
-                src={product.images[activeImage]}
-                alt={product.name}
-                fill
-                priority
-                sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-on-surface-variant/50">No Image</div>
-            )}
-          </div>
-          {product.images?.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto">
-              {product.images.map((img, idx) => (
-                <button
-                  key={img + idx}
-                  onClick={() => setActiveImage(idx)}
-                  aria-label={`Show image ${idx + 1}`}
-                  className={`relative w-20 h-20 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${
-                    idx === activeImage ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"
-                  }`}
-                >
-                  <Image src={img} alt="" fill sizes="80px" className="object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="min-w-0">
+          <ProductGallery key={product._id} images={product.images ?? []} name={product.name} />
         </motion.div>
 
         {/* Details */}
@@ -374,6 +381,14 @@ export default function ProductDetailPage() {
           </ul>
         )}
       </section>
+
+      {/* Similar products from the same category (loads when scrolled into view) */}
+      <SimilarProducts
+        key={product._id}
+        productId={product._id}
+        categoryName={categoryName}
+        categorySlug={categorySlug}
+      />
     </div>
   );
 }

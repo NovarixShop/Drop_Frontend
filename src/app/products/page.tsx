@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import ProductImage from '@/components/products/ProductImage';
 import { useProductStore } from '@/store/productStore';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
@@ -11,6 +11,17 @@ import { Heart, Filter, X, SearchX } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import ProductSkeleton from '@/components/products/ProductSkeleton';
+import { productHref } from '@/lib/productHref';
+
+// Values the catalog service understands (catalog-service product.service.ts).
+const SORT_OPTIONS = [
+  { key: 'newest', label: 'Newest First' },
+  { key: 'price-desc', label: 'Price: High to Low' },
+  { key: 'price-asc', label: 'Price: Low to High' },
+  { key: 'rating', label: 'Popularity' },
+] as const;
+
+type SortKey = (typeof SORT_OPTIONS)[number]['key'];
 
 function ProductsPageContent() {
   const searchParams = useSearchParams();
@@ -20,7 +31,7 @@ function ProductsPageContent() {
   const { addItem, setCartOpen } = useCartStore();
   const { toggleItem, isInWishlist } = useWishlistStore();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [sortBy, setSortBy] = useState('Newest First');
+  const [sortBy, setSortBy] = useState<SortKey>('newest');
   const [maxPrice, setMaxPrice] = useState<number>(50000);
 
   useEffect(() => {
@@ -28,20 +39,26 @@ function ProductsPageContent() {
     if (categoryParam) {
       setFilter('category', categoryParam);
     } else {
-      fetchProducts();
+      fetchProducts({ sort: sortBy });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryParam]);
+
+  // Re-query the server when the sort changes, rather than leaving the control inert.
+  const handleSortChange = (key: SortKey) => {
+    setSortBy(key);
+    fetchProducts({ sort: key });
+  };
 
   const handleCategoryChange = (cat: string) => {
     setFilter('category', filters.category === cat ? null : cat);
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] bg-surface text-on-surface font-body-md relative">
+    <div className="min-h-below-nav bg-surface text-on-surface font-body-md relative flex">
       
       {/* Mobile Filter Toggle */}
-      <div className="lg:hidden fixed bottom-6 right-6 z-50">
+      <div className="fixed right-6 bottom-24 z-50 lg:hidden">
         <button 
           onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
           className="bg-primary text-white p-4 rounded-full shadow-lg active:scale-95 transition-transform"
@@ -51,7 +68,7 @@ function ProductsPageContent() {
       </div>
 
       {/* SideNavBar (Filter Drawer) */}
-      <aside className={`${mobileFilterOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:sticky top-16 left-0 h-[calc(100vh-4rem)] w-80 z-40 bg-surface border-r border-outline-variant/30 shadow-sm transition-transform duration-500 overflow-y-auto`}>
+      <aside className={`${mobileFilterOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 top-nav h-below-nav fixed left-0 z-40 w-80 lg:sticky bg-surface border-r border-outline-variant/30 shadow-sm transition-transform duration-500 overflow-y-auto`}>
         <div className="flex flex-col h-full py-10 px-6">
           <div className="mb-10">
             <h2 className="font-headline-lg text-2xl text-on-surface font-bold">Filters</h2>
@@ -106,7 +123,7 @@ function ProductsPageContent() {
           
           <button 
             onClick={() => {
-              fetchProducts();
+              fetchProducts({ sort: sortBy });
               setMobileFilterOpen(false);
             }}
             className="mt-10 w-full bg-primary text-on-primary py-4 rounded-xl font-label-md hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-95 shadow-lg shadow-primary/20"
@@ -134,15 +151,17 @@ function ProductsPageContent() {
           </div>
           <div className="flex items-center gap-4 bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant/30">
             <span className="text-label-md text-on-surface-variant uppercase tracking-wider">Sort:</span>
-            <select 
+            <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-transparent border-none py-1 focus:ring-0 font-label-md text-on-surface outline-none cursor-pointer"
+              onChange={(e) => handleSortChange(e.target.value as SortKey)}
+              aria-label="Sort products"
+              className="font-label-md text-on-surface cursor-pointer border-none bg-transparent py-1 outline-none focus:ring-0"
             >
-              <option className="text-black">Newest First</option>
-              <option className="text-black">Price: High to Low</option>
-              <option className="text-black">Price: Low to High</option>
-              <option className="text-black">Popularity</option>
+              {SORT_OPTIONS.map(({ key, label }) => (
+                <option key={key} value={key} className="text-black">
+                  {label}
+                </option>
+              ))}
             </select>
           </div>
         </motion.header>
@@ -170,9 +189,10 @@ function ProductsPageContent() {
                     className="product-card-hover group relative flex flex-col transition-all duration-500"
                   >
                     <div className="aspect-[4/5] relative overflow-hidden bg-surface-container-low rounded-2xl mb-6 soft-shadow">
-                      <Link href={`/products/${product.slug}`}>
+                      <Link href={productHref(product.slug) ?? "/products"}>
                         {product.images && product.images.length > 0 ? (
-                          <Image 
+                          <ProductImage 
+                            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" 
                             src={product.images[0]} 
                             alt={product.name}
                             fill
@@ -205,7 +225,7 @@ function ProductsPageContent() {
                         <Heart className="w-5 h-5" fill={isInWishlist(product._id || product.id || '') ? "currentColor" : "none"} />
                       </button>
                       
-                      <div className="absolute bottom-0 left-0 p-4 w-full bg-gradient-to-t from-black/80 via-black/40 to-transparent md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
+                      <div className="scrim-bottom absolute bottom-0 left-0 w-full p-4 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
                         <button 
                           onClick={(e) => {
                             e.preventDefault();
@@ -232,7 +252,7 @@ function ProductsPageContent() {
                     
                     <div className="flex flex-col gap-2 flex-grow px-2">
                       <div className="flex justify-between items-start gap-4">
-                        <Link href={`/products/${product.slug}`}>
+                        <Link href={productHref(product.slug) ?? "/products"}>
                           <h3 className="font-body-md font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1">
                             {product.name}
                           </h3>
@@ -283,7 +303,7 @@ function ProductsPageContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-body-md text-on-surface-variant">Loading collection...</div>}>
+    <Suspense fallback={<div className="min-h-svh flex items-center justify-center font-body-md text-on-surface-variant">Loading collection...</div>}>
       <ProductsPageContent />
     </Suspense>
   );
