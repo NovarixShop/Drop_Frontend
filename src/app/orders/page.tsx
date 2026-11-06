@@ -55,7 +55,7 @@ export default function OrdersPage() {
 
   if (!isClient || !isAuthenticated || loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center gap-3 text-on-surface-variant">
+      <div className="min-h-[60svh] flex items-center justify-center gap-3 text-on-surface-variant">
         <Loader2 className="animate-spin" /> Loading your orders...
       </div>
     );

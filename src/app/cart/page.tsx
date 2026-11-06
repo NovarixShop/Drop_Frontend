@@ -6,7 +6,7 @@ import { useGamificationStore } from "@/store/gamificationStore";
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import ProductImage from "@/components/products/ProductImage";
 import Link from "next/link";
 import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 
@@ -25,7 +25,7 @@ export default function CartPage() {
   }, [isAuthenticated, fetchRewards]);
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] pt-12 pb-24 px-4 bg-zinc-50 dark:bg-black">
+    <div className="min-h-below-nav pt-12 pb-24 px-4 bg-zinc-50 dark:bg-black">
       <div className="max-w-6xl mx-auto">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
@@ -62,7 +62,7 @@ export default function CartPage() {
                   className="flex gap-6 bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5"
                 >
                   <div className="relative w-32 h-32 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0">
-                    <Image src={item.image} alt={item.name} fill className="object-cover" />
+                    <ProductImage sizes="128px" src={item.image} alt={item.name} fill className="object-cover" />
                   </div>
                   
                   <div className="flex-1 flex flex-col justify-between py-2">
