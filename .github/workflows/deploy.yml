@@ -58,11 +58,6 @@ jobs:
           port: ${{ secrets.HOSTINGER_SSH_PORT || 22 }}
           script_stop: true
           script: |
-            # Load environment paths (NVM, npm, PM2) for non-interactive SSH sessions
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            export PATH="$PATH:/usr/local/bin:/usr/bin:$HOME/.nvm/versions/node/$(ls $HOME/.nvm/versions/node 2>/dev/null | tail -1)/bin"
-
             TARGET_DIR="${{ secrets.HOSTINGER_FRONTEND_DIR || '/var/www/Drop_Frontend' }}"
             echo "🚀 Deploying Storefront to $TARGET_DIR on Hostinger VPS..."
             
@@ -84,8 +79,31 @@ jobs:
             npm ci
             npm run build
             
-            echo "🔄 Restarting Next.js server on PM2..."
-            pm2 restart drop-frontend --update-env || pm2 restart all || pm2 start npm --name "drop-frontend" -- start
-            pm2 save
+            echo "🔄 Restarting application across PM2 / systemd / port 3000..."
+            if command -v pm2 >/dev/null 2>&1; then
+              pm2 restart drop-frontend --update-env || pm2 restart all || true
+              pm2 save || true
+            fi
+            
+            if id "ubuntu" >/dev/null 2>&1 && command -v sudo >/dev/null 2>&1; then
+              sudo -u ubuntu -i pm2 restart drop-frontend --update-env 2>/dev/null || sudo -u ubuntu -i pm2 restart all 2>/dev/null || true
+            fi
+            
+            systemctl restart drop-frontend 2>/dev/null || systemctl restart frontend 2>/dev/null || true
+            
+            # Terminate whatever is listening on port 3000 so the supervisor reloads the new .next build
+            fuser -k -TERM 3000/tcp 2>/dev/null || true
+            sleep 3
+            
+            # If port 3000 is not listening, start via pm2 or nohup
+            if ! ss -lnt 2>/dev/null | grep -q ":3000 "; then
+              echo "Starting frontend on port 3000..."
+              if command -v pm2 >/dev/null 2>&1; then
+                pm2 start npm --name "drop-frontend" -- start
+                pm2 save || true
+              else
+                nohup npm start > /var/log/drop-frontend.log 2>&1 &
+              fi
+            fi
             
             echo "✅ Storefront deployment complete!"
