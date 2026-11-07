@@ -13,7 +13,8 @@ export interface Order {
   items: OrderItem[];
   shippingAddress: { street: string; city: string; state: string; postalCode: string; country: string };
   totals: { subtotal: number; discount: number; tax: number; shipping: number; grandTotal: number };
-  paymentMethod: "stripe" | "paypal" | "cod";
+  // "stripe"/"paypal" only appear on orders placed before the Razorpay switch.
+  paymentMethod: "razorpay" | "cod" | "stripe" | "paypal";
   paymentStatus: PaymentStatus;
   orderStatus: OrderStatus;
   trackingNumber: string;
@@ -30,6 +31,9 @@ export const ORDER_STATUS_STYLES: Record<OrderStatus, { label: string; className
 
 export const shortOrderId = (id: string) => id.slice(-8).toUpperCase();
 
-// Card orders whose payment didn't go through can still be paid until they're cancelled
+// Online orders whose payment didn't go through can still be paid until they're cancelled.
+// Anything that isn't COD is a gateway order, which keeps legacy "stripe" orders payable.
 export const needsPayment = (order: Order) =>
-  order.paymentMethod === "stripe" && order.paymentStatus !== "paid" && order.orderStatus !== "cancelled";
+  order.paymentMethod !== "cod" &&
+  order.paymentStatus !== "paid" &&
+  order.orderStatus !== "cancelled";

@@ -10,7 +10,13 @@ import { api, getErrorMessage } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { useIsClient } from "@/lib/useIsClient";
 import { Order, ORDER_STATUS_STYLES, needsPayment, shortOrderId } from "@/lib/orders";
-import { CardFields, emptyCard } from "@/components/checkout/CardFields";
+import { useLenis } from "@studio-freight/react-lenis";
+import {
+  openRazorpayCheckout,
+  loadRazorpayCheckout,
+  RazorpayDismissedError,
+  type RazorpaySession,
+} from "@/lib/razorpay";
 
 interface Checkpoint {
   status: string;
@@ -25,14 +31,17 @@ interface Tracking {
   checkpoints: Checkpoint[];
 }
 
-// The mock payment gateway settles a successful charge about a second later
-const SETTLEMENT_DELAY_MS = 1500;
+// The server marks the order paid inside the verify call, but Razorpay's own capture
+// webhook can land a moment later; this pause keeps the refreshed view consistent.
+const SETTLEMENT_DELAY_MS = 800;
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const isClient = useIsClient();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
+  // Pausing Lenis keeps the Razorpay overlay's iframe clickable.
+  const lenis = useLenis();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [tracking, setTracking] = useState<Tracking | null>(null);
@@ -40,7 +49,6 @@ export default function OrderDetailPage() {
   const [error, setError] = useState("");
 
   const [cancelling, setCancelling] = useState(false);
-  const [card, setCard] = useState(emptyCard);
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState("");
 
@@ -101,27 +109,44 @@ export default function OrderDetailPage() {
     setPayError("");
     setPaying(true);
     try {
-      await api.post(`/payments/charge/${id}`, card);
+      const res = await api.post(`/payments/razorpay/order/${id}`);
+      const session: RazorpaySession = res.data.data;
+
+      const handles = await openRazorpayCheckout(session, {
+        description: `Order ${shortOrderId(String(id))}`,
+        prefill: { name: user?.name, email: user?.email },
+        pauseScroll: () => lenis?.stop(),
+        resumeScroll: () => lenis?.start(),
+      });
+
+      await api.post("/payments/razorpay/verify", { orderId: id, ...handles });
       await new Promise((resolve) => setTimeout(resolve, SETTLEMENT_DELAY_MS));
       // A failed refresh shouldn't be reported as a failed payment
       await reload().catch(() => {});
-      setCard(emptyCard);
       toast.success("Payment received. Thank you!");
     } catch (err) {
-      const declined = axios.isAxiosError(err) && err.response?.status === 402;
-      setPayError(
-        declined
-          ? "Your card was declined. Please check the details or use another card."
-          : getErrorMessage(err, "Payment failed. Please try again.")
-      );
+      if (err instanceof RazorpayDismissedError) {
+        setPayError("Payment was cancelled. This order is still waiting for payment.");
+      } else if (axios.isAxiosError(err) && err.response?.status === 503) {
+        setPayError("Card payments are unavailable right now. Please try again later.");
+      } else if (err instanceof Error && !axios.isAxiosError(err)) {
+        setPayError(err.message);
+      } else {
+        setPayError(getErrorMessage(err, "Payment failed. Please try again."));
+      }
     } finally {
       setPaying(false);
     }
   };
 
+  // Warm the gateway script while the shopper reads the order, so Pay opens instantly.
+  useEffect(() => {
+    if (order && needsPayment(order)) loadRazorpayCheckout().catch(() => {});
+  }, [order]);
+
   if (!isClient || !isAuthenticated || loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center gap-3 text-on-surface-variant">
+      <div className="min-h-[60svh] flex items-center justify-center gap-3 text-on-surface-variant">
         <Loader2 className="animate-spin" /> Loading order...
       </div>
     );
@@ -129,7 +154,7 @@ export default function OrderDetailPage() {
 
   if (error || !order) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+      <div className="min-h-[60svh] flex flex-col items-center justify-center text-center px-4">
         <h1 className="text-3xl font-bold mb-4">Order not found</h1>
         <p className="text-on-surface-variant mb-8">{error}</p>
         <Link href="/orders" className="bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md">
@@ -180,7 +205,10 @@ export default function OrderDetailPage() {
           <p className="text-on-surface-variant font-caption mb-6">
             This order is waiting for payment of ₹{totals.grandTotal.toFixed(2)}.
           </p>
-          <CardFields card={card} onChange={setCard} />
+          <p className="text-on-surface-variant font-caption mb-6">
+            Pressing Pay opens Razorpay&apos;s secure window, where you can pay by card, UPI,
+            netbanking or wallet.
+          </p>
           {payError && (
             <div className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/50 text-red-500 text-sm">
               {payError}

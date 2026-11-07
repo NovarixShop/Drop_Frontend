@@ -54,7 +54,7 @@ function ResetPasswordForm() {
     <>
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold tracking-tight mb-2">Set a new password</h1>
-        <p className="text-gray-400">Choose a password with at least 6 characters</p>
+        <p className="text-gray-400">Choose a password with at least 8 characters</p>
       </div>
 
       {error && (
@@ -76,7 +76,7 @@ function ResetPasswordForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            minLength={6}
+            minLength={8}
             autoComplete="new-password"
             className={inputClass}
             placeholder="••••••••"
@@ -89,7 +89,7 @@ function ResetPasswordForm() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            minLength={6}
+            minLength={8}
             autoComplete="new-password"
             className={inputClass}
             placeholder="••••••••"
@@ -114,7 +114,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
+    <div className="min-h-below-nav flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

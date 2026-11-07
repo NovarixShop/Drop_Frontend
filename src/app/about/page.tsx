@@ -7,7 +7,7 @@ import { ArrowRight, CheckCircle2, Sparkles, Hexagon, Fingerprint } from 'lucide
 
 export default function AboutPage() {
   return (
-    <div className="bg-[#09090b] text-zinc-100 selection:bg-primary/30 min-h-screen pb-32 md:pb-0">
+    <div className="bg-[#09090b] text-zinc-100 selection:bg-primary/30 min-h-svh pb-32 md:pb-0">
       {/* Background ambient gradients */}
         <div className="fixed inset-0 z-0 pointer-events-none">
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full mix-blend-screen" />
@@ -16,7 +16,7 @@ export default function AboutPage() {
 
         <main className="relative z-10 pt-20">
           {/* Hero Section: The Philosophy */}
-          <section className="relative min-h-[90vh] flex items-center">
+          <section className="relative min-h-[90svh] flex items-center">
             <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
               <motion.div 
                 initial={{ opacity: 0, x: -40 }}

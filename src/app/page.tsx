@@ -3,13 +3,14 @@
 import { useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import ProductImage from '@/components/products/ProductImage';
 import { useProductStore } from '@/store/productStore';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import ProductSkeleton from '@/components/products/ProductSkeleton';
+import { productHref } from '@/lib/productHref';
 
 export default function Home() {
   const { trendingProducts, fetchTrendingProducts, isLoading } = useProductStore();
@@ -31,13 +32,13 @@ export default function Home() {
   }, [fetchTrendingProducts]);
 
   return (
-    <div className="pt-20 md:pt-8">
+    <div className="pt-6 md:pt-8">
       {/* Hero Collage Section */}
       <section ref={heroRef} className="max-w-[1440px] mx-auto px-6 py-10 overflow-hidden">
-        <div className="flex flex-col md:grid md:grid-cols-12 md:grid-rows-2 gap-4 md:h-[870px]">
+        <div className="flex flex-col gap-4 md:grid md:h-[clamp(34rem,calc(100svh-var(--nav-h)-6rem),54rem)] md:grid-cols-12 md:grid-rows-2">
           {/* Main Large Feature: Fashion */}
           <div className="md:col-span-7 md:row-span-2 relative overflow-hidden rounded-2xl group hero-collage-item h-[500px] md:h-auto">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+            <div className="scrim-bottom-soft absolute inset-0 z-10"></div>
             <motion.div 
               className="absolute -inset-10 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" 
               initial={{ scale: 1.1 }}
@@ -45,9 +46,9 @@ export default function Home() {
               transition={{ duration: 1.5, ease: "easeOut" }}
               style={{ y: y1, backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCX3F2C5aka18RZtJ5yd0KTYBdvMe5_MfVP3oGZUOoPNZZbiBz1rEf_GKz6xuqbhcDD7dppvssJtqkHbIsIkEXAjhgn3aZYWtNJFH2zli46um0RS_amfF07Vht4yWURf0PcAV2nezBDOctbWn4N6xdZNGhsPUILKIlFR5TGIC7FD5u5o9CEyEKS1ZsZAzt7PeCUvXzSSHSQQ2xcK1ZG9_8zIY4zpja8zjB-FshWasieAJrAQVUm-DhX')" }}
             ></motion.div>
-            <div className="absolute bottom-10 left-10 z-20">
+            <div className="absolute bottom-6 left-6 right-6 z-20 md:bottom-10 md:left-10 md:right-10">
               <span className="bg-primary px-2 py-1 rounded-full text-white font-label-md text-[10px] tracking-widest uppercase mb-2 inline-block">Fashion</span>
-              <h1 className="font-display-lg-mobile md:font-display-lg text-white mb-4">The New <br />Standard</h1>
+              <h1 className="font-display-lg text-white mb-4">The New <br />Standard</h1>
               <Link href="/products?category=fashion">
                 <button className="bg-white text-black px-8 py-4 rounded-xl font-label-md hover:bg-primary-container hover:text-white transition-all duration-300 active:scale-95">Explore Collection</button>
               </Link>
@@ -56,7 +57,7 @@ export default function Home() {
           
           {/* Secondary: Tech */}
           <div className="md:col-span-5 md:row-span-1 relative overflow-hidden rounded-2xl group hero-collage-item h-[300px] md:h-auto">
-            <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent z-10"></div>
+            <div className="scrim-left absolute inset-0 z-10"></div>
             <motion.div 
               className="absolute -inset-10 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" 
               initial={{ scale: 1.1 }}
@@ -90,12 +91,12 @@ export default function Home() {
       </section>
 
       {/* The Essence of LUXE (Editorial) */}
-      <section className="py-24 md:py-40 max-w-4xl mx-auto px-6 text-center">
+      <section className="mx-auto max-w-4xl px-6 py-20 text-center md:py-40">
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="font-display-lg-mobile md:font-display-sm text-on-surface mb-8"
+          className="font-display-sm text-on-surface mb-8"
         >
           Redefining the baseline.
         </motion.h2>
@@ -111,8 +112,8 @@ export default function Home() {
       </section>
 
       {/* Featured Categories - Sticky Overlap */}
-      <section className="max-w-[1440px] mx-auto px-6 py-10 mb-40 relative">
-        <div className="flex justify-between items-end mb-16">
+      <section className="relative mx-auto mb-24 max-w-[1440px] px-6 py-10 md:mb-40">
+        <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between md:mb-16">
           <h2 className="font-headline-xl text-on-surface text-3xl md:text-5xl">Explore by Discipline</h2>
         </div>
         
@@ -141,14 +142,14 @@ export default function Home() {
               viewport={{ once: true, margin: "-10%" }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="sticky w-full origin-top"
-              style={{ 
-                top: `calc(10vh + ${i * 40}px)`,
-                zIndex: i + 1
+              style={{
+                top: `calc(var(--nav-h) + 1.5rem + ${i * 2.5}rem)`,
+                zIndex: i + 1,
               }}
             >
-              <Link href={cat.link} className="relative block w-full h-[60vh] md:h-[75vh] rounded-[2.5rem] overflow-hidden group shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.3)] border border-outline-variant/30 bg-surface">
+              <Link href={cat.link} className="relative block w-full h-[clamp(20rem,52svh,35rem)] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden group shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.3)] border border-outline-variant/30 bg-surface">
                 <div className="absolute inset-0 bg-cover bg-center transition-transform duration-[1.5s] group-hover:scale-105" style={{ backgroundImage: `url('${cat.img}')` }}></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/10"></div>
+                <div className="scrim-bottom absolute inset-0"></div>
                 <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16">
                   <span className="text-white/80 font-label-md tracking-widest uppercase mb-4 block transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">Shop Collection</span>
                   <h3 className="font-headline-xl text-white text-4xl md:text-7xl transform translate-y-0 group-hover:-translate-y-4 transition-transform duration-500">{cat.title}</h3>
@@ -160,13 +161,13 @@ export default function Home() {
       </section>
 
       {/* Trending Now / Bento Grid Section */}
-      <section className="max-w-[1440px] mx-auto px-6 py-32 bg-surface rounded-t-[3rem] mt-10 shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.05)] relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-outline-variant/50 to-transparent"></div>
+      <section className="bg-surface relative mx-auto mt-10 max-w-[1440px] rounded-t-[2rem] px-6 py-20 shadow-[0_-20px_60px_-15px_rgba(0,0,0,0.05)] md:rounded-t-[3rem] md:py-32">
+        <div className="hairline absolute top-0 left-1/2 h-px w-[80%] -translate-x-1/2"></div>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          className="flex justify-between items-end mb-16"
+          className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between md:mb-16"
         >
           <div>
             <h2 className="font-headline-xl text-on-surface text-3xl md:text-5xl">Trending Now</h2>
@@ -195,10 +196,11 @@ export default function Home() {
                   key={product._id || product.id || index}
                   className="group cursor-pointer flex flex-col"
                 >
-                  <Link href={`/products/${product.slug}`} className="flex-1 flex flex-col">
+                  <Link href={productHref(product.slug) ?? "/products"} className="flex-1 flex flex-col">
                     <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-surface-container-low mb-6 soft-shadow">
                       {product.images && product.images.length > 0 ? (
-                        <Image 
+                        <ProductImage 
+                          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" 
                           src={product.images[0]} 
                           alt={product.name}
                           fill
@@ -265,7 +267,7 @@ export default function Home() {
                 </motion.div>
               ))
             ) : (
-              <div className="col-span-4 text-center py-20 text-on-surface-variant font-body-md border border-dashed border-outline-variant/50 rounded-2xl">
+              <div className="col-span-full text-center py-20 text-on-surface-variant font-body-md border border-dashed border-outline-variant/50 rounded-2xl">
                 No trending products available at the moment.
               </div>
             )}
@@ -274,8 +276,8 @@ export default function Home() {
       </section>
 
       {/* The Private Club (Newsletter) */}
-      <section className="bg-surface-container-low border-y border-outline-variant/30 py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
+      <section className="bg-surface-container-low border-outline-variant/30 relative overflow-hidden border-y py-20 md:py-32">
+        <div className="bg-gradient-brand-soft absolute inset-0"></div>
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}

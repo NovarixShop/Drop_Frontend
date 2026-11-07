@@ -108,6 +108,8 @@ api.interceptors.response.use(
                      parsed.state.isAuthenticated = false;
                      parsed.state.user = null;
                      localStorage.setItem('auth-storage', JSON.stringify(parsed));
+                     // Runs inside an axios interceptor (outside React), so a full page load is intended here
+                     // eslint-disable-next-line @next/next/no-location-assign-relative-destination
                      window.location.href = '/login';
                  } catch {}
             }

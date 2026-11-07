@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export default function CategoriesPage() {
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center pt-24 px-4">
+    <div className="min-h-below-nav flex items-center justify-center px-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}

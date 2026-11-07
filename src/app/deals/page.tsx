@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { api } from "@/lib/api";
 import { CountdownTimer } from "@/components/deals/CountdownTimer";
 import Link from "next/link";
+import { productHref } from "@/lib/productHref";
 
 interface DealProduct {
   _id: string;
@@ -46,7 +47,7 @@ export default function DealsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center pt-24 px-4">
+      <div className="min-h-below-nav flex items-center justify-center pt-24 px-4">
         <p className="text-white">Loading deals...</p>
       </div>
     );
@@ -54,7 +55,7 @@ export default function DealsPage() {
 
   if (deals.length === 0) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center pt-24 px-4">
+      <div className="min-h-below-nav flex flex-col items-center justify-center pt-24 px-4">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -68,7 +69,7 @@ export default function DealsPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] pt-24 px-4 pb-20 max-w-7xl mx-auto">
+    <div className="min-h-below-nav px-4 pt-10 pb-20 max-w-7xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -145,7 +146,7 @@ export default function DealsPage() {
                     <CountdownTimer targetDate={endTime} />
                     {deal.products && deal.products.length > 0 && (
                       <Link 
-                        href={`/products/${deal.products[0].slug}`}
+                        href={productHref(deal.products[0].slug) ?? "/products"}
                         className="mt-6 block w-full bg-primary hover:bg-primary/90 text-white text-center font-bold py-3 px-4 rounded-lg transition-colors"
                       >
                         Shop Now

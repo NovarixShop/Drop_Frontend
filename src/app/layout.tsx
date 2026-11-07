@@ -34,18 +34,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.variable} ${inter.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${inter.variable} antialiased`}
       suppressHydrationWarning
     >
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
-      <body className="min-h-full flex flex-col transition-colors duration-300">
+      <body className="min-h-svh flex flex-col transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <AccountSync />
           <Navbar />
           <SmoothScroll>
-            <main className="flex-1 flex flex-col w-full h-full">
+            <main className="flex-1 flex w-full flex-col">
               <RouteTransition>{children}</RouteTransition>
             </main>
           </SmoothScroll>

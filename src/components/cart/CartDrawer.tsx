@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/store/cartStore';
 import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
-import Image from 'next/image';
+import ProductImage from '@/components/products/ProductImage';
 
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
@@ -61,7 +61,7 @@ export function CartDrawer() {
                   <div key={item.id} className="flex gap-4 p-4 rounded-xl bg-surface-container-low border border-outline-variant/30">
                     <div className="relative w-20 h-24 rounded-lg overflow-hidden bg-surface-container shrink-0">
                       {item.image ? (
-                        <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        <ProductImage sizes="96px" src={item.image} alt={item.name} fill className="object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-xs opacity-50">No Img</div>
                       )}

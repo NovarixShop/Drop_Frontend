@@ -2,18 +2,19 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import ProductImage from '@/components/products/ProductImage';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { useCartStore } from '@/store/cartStore';
 import { Heart, HeartOff, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
+import { productHref } from '@/lib/productHref';
 
 export default function WishlistPage() {
   const { items: wishlistItems, removeItem, clearWishlist } = useWishlistStore();
   const { addItem, setCartOpen } = useCartStore();
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-svh bg-surface">
       <div className="max-w-[1440px] mx-auto px-4 md:px-6 pt-24 pb-32">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
           <div>
@@ -48,9 +49,10 @@ export default function WishlistPage() {
                 className="product-card-hover group relative flex flex-col transition-all duration-500"
               >
                 <div className="aspect-[4/5] relative overflow-hidden bg-surface-container-low rounded-2xl mb-6 soft-shadow">
-                  <Link href={`/products/${product.slug}`}>
+                  <Link href={productHref(product.slug) ?? "/products"}>
                     {product.image ? (
-                      <Image 
+                      <ProductImage 
+                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" 
                         src={product.image} 
                         alt={product.name}
                         fill
@@ -73,7 +75,7 @@ export default function WishlistPage() {
                     <HeartOff className="w-5 h-5" />
                   </button>
                   
-                  <div className="absolute bottom-0 left-0 p-4 w-full bg-gradient-to-t from-black/80 via-black/40 to-transparent md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
+                  <div className="scrim-bottom absolute bottom-0 left-0 w-full p-4 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
                     <button 
                       onClick={(e) => {
                         e.preventDefault();
@@ -101,7 +103,7 @@ export default function WishlistPage() {
                 
                 <div className="flex flex-col gap-2 flex-grow px-2">
                   <div className="flex justify-between items-start gap-4">
-                    <Link href={`/products/${product.slug}`}>
+                    <Link href={productHref(product.slug) ?? "/products"}>
                       <h3 className="font-body-md font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1">
                         {product.name}
                       </h3>

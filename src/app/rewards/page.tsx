@@ -39,7 +39,7 @@ export default function RewardsPage() {
   ) : null;
 
   return (
-    <div className="bg-surface min-h-screen pt-24 md:pt-12 pb-40">
+    <div className="bg-surface min-h-svh pt-10 pb-40 md:pt-12">
       <div className="max-w-[1440px] mx-auto px-6">
         
         {/* Header */}
@@ -95,7 +95,7 @@ export default function RewardsPage() {
                 <p className="text-on-surface-variant text-sm">{lockMessage ?? 'Make your first purchase to unlock the Daily Spin and Mystery Cards.'}</p>
               </div>
             )}
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
+            <div className="bg-gradient-brand-soft pointer-events-none absolute inset-0"></div>
             <div className="text-center mb-8 md:mb-10 relative z-10">
               <div className="w-12 h-12 md:w-16 md:h-16 bg-surface rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-sm">
                 <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-primary" />
@@ -123,7 +123,7 @@ export default function RewardsPage() {
                 <p className="text-on-surface-variant text-sm">{lockMessage ?? 'Make a purchase to unlock scratch cards with hidden offers.'}</p>
               </div>
             )}
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-bl from-primary/5 to-transparent pointer-events-none"></div>
+            <div className="bg-gradient-brand-soft pointer-events-none absolute inset-0"></div>
              <div className="text-center mb-8 md:mb-10 relative z-10">
               <div className="w-12 h-12 md:w-16 md:h-16 bg-surface rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-sm">
                 <Ticket className="w-6 h-6 md:w-8 md:h-8 text-primary" />
@@ -169,7 +169,7 @@ export default function RewardsPage() {
                   key={coupon.code} 
                   className={`bg-surface border border-outline-variant/50 rounded-2xl p-6 md:p-8 text-center shadow-sm relative overflow-hidden group hover:border-primary/50 transition-colors ${coupon.status !== 'available' ? 'opacity-50' : ''}`}
                 >
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container transform origin-left scale-x-100 group-hover:scale-x-0 transition-transform duration-500"></div>
+                  <div className="bg-gradient-brand absolute top-0 left-0 h-1 w-full origin-left scale-x-100 transition-transform duration-500 group-hover:scale-x-0"></div>
                   <h3 className="font-headline-lg text-primary mb-2 font-bold text-xl md:text-2xl">{coupon.label}</h3>
                   <button
                     onClick={() => copyCode(coupon.code)}

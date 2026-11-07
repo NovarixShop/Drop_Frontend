@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import ProductImage from "@/components/products/ProductImage";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { CheckCircle2, CreditCard, Loader2, MapPin, Truck, Tag, X } from "lucide-react";
@@ -13,7 +13,13 @@ import { useCartStore, CartItem } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
 import { useGamificationStore } from "@/store/gamificationStore";
 import { useIsClient } from "@/lib/useIsClient";
-import { CardFields, emptyCard } from "@/components/checkout/CardFields";
+import { useLenis } from "@studio-freight/react-lenis";
+import {
+  openRazorpayCheckout,
+  loadRazorpayCheckout,
+  RazorpayDismissedError,
+  type RazorpaySession,
+} from "@/lib/razorpay";
 
 interface ServerCartItem {
   product: { _id: string; name: string; price: number; images: string[]; stock: number; isActive: boolean };
@@ -41,7 +47,7 @@ interface PlacedOrder {
   totals: { grandTotal: number };
 }
 
-type PaymentMethod = "cod" | "stripe";
+type PaymentMethod = "cod" | "razorpay";
 
 const emptyAddress: Address = { street: "", city: "", state: "", postalCode: "", country: "India" };
 
@@ -82,11 +88,13 @@ const syncCartToServer = async (localItems: CartItem[]): Promise<{ cart: ServerC
 export default function CheckoutPage() {
   const router = useRouter();
   const { items } = useCartStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const { coupons: rewardCoupons, fetchRewards } = useGamificationStore();
   const availableRewardCoupons = rewardCoupons.filter((c) => c.status === "available");
 
   const hydrated = useIsClient();
+  // Pausing Lenis while the Razorpay overlay is open keeps its iframe clickable.
+  const lenis = useLenis();
   const [cart, setCart] = useState<ServerCart | null>(null);
   const [syncing, setSyncing] = useState(true);
   const [syncError, setSyncError] = useState("");
@@ -101,7 +109,6 @@ export default function CheckoutPage() {
   const [couponLoading, setCouponLoading] = useState(false);
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
-  const [card, setCard] = useState(emptyCard);
 
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState("");
@@ -112,6 +119,14 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (hydrated && !isAuthenticated) router.replace("/login?redirect=/checkout");
   }, [hydrated, isAuthenticated, router]);
+
+  // Fetch checkout.js up front once card is selected, so pressing Pay opens the overlay
+  // immediately instead of waiting on a network round trip. Failures surface at pay time.
+  useEffect(() => {
+    if (paymentMethod === "razorpay" || pendingOrder) {
+      loadRazorpayCheckout().catch(() => {});
+    }
+  }, [paymentMethod, pendingOrder]);
 
   useEffect(() => {
     const localItems = useCartStore.getState().items;
@@ -186,17 +201,41 @@ export default function CheckoutPage() {
     }
   };
 
-  const chargeCard = async (order: PlacedOrder): Promise<boolean> => {
+  /**
+   * Opens Razorpay Checkout for an order that already exists server-side, then has the
+   * server verify the result. Returns false (with `error` set) if anything went wrong, so
+   * the caller can keep the order around for a retry instead of placing a second one.
+   */
+  const payWithRazorpay = async (order: PlacedOrder): Promise<boolean> => {
     try {
-      await api.post(`/payments/charge/${order._id}`, card);
+      const res = await api.post(`/payments/razorpay/order/${order._id}`);
+      const session: RazorpaySession = res.data.data;
+
+      const handles = await openRazorpayCheckout(session, {
+        description: `Order ${order._id.slice(-8).toUpperCase()}`,
+        prefill: { name: user?.name, email: user?.email },
+        pauseScroll: () => lenis?.stop(),
+        resumeScroll: () => lenis?.start(),
+      });
+
+      // Only the server may decide an order is paid: it re-checks the signature and the
+      // captured amount against the stored total before releasing anything.
+      await api.post("/payments/razorpay/verify", { orderId: order._id, ...handles });
       return true;
     } catch (err) {
-      const declined = axios.isAxiosError(err) && err.response?.status === 402;
-      setError(
-        declined
-          ? "Your card was declined. Please check the details or use another card."
-          : getErrorMessage(err, "Payment failed. Please try again.")
-      );
+      if (err instanceof RazorpayDismissedError) {
+        setError(
+          "Payment was cancelled. Your order is saved \u2014 use Retry Payment when you're ready."
+        );
+      } else if (axios.isAxiosError(err) && err.response?.status === 503) {
+        setError(
+          "Card payments are unavailable right now. You can place this order as Cash on Delivery instead."
+        );
+      } else if (err instanceof Error && !axios.isAxiosError(err)) {
+        setError(err.message);
+      } else {
+        setError(getErrorMessage(err, "Payment failed. Please try again."));
+      }
       return false;
     }
   };
@@ -217,7 +256,7 @@ export default function CheckoutPage() {
     try {
       // Retrying payment for an order that already exists
       if (pendingOrder) {
-        if (await chargeCard(pendingOrder)) completeOrder(pendingOrder);
+        if (await payWithRazorpay(pendingOrder)) completeOrder(pendingOrder);
         return;
       }
 
@@ -239,8 +278,8 @@ export default function CheckoutPage() {
       });
       const order: PlacedOrder = res.data.data.order;
 
-      if (paymentMethod === "stripe") {
-        if (!(await chargeCard(order))) {
+      if (paymentMethod === "razorpay") {
+        if (!(await payWithRazorpay(order))) {
           // The order is placed and the server cart is cleared; only payment remains
           setPendingOrder(order);
           useCartStore.getState().clearCart();
@@ -259,7 +298,7 @@ export default function CheckoutPage() {
   // An empty local cart has nothing to sync, so it skips straight to the empty state
   if (!hydrated || !isAuthenticated || (syncing && items.length > 0)) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center gap-3 text-on-surface-variant">
+      <div className="min-h-[60svh] flex items-center justify-center gap-3 text-on-surface-variant">
         <Loader2 className="animate-spin" /> Preparing checkout...
       </div>
     );
@@ -308,7 +347,7 @@ export default function CheckoutPage() {
 
   if (!pendingOrder && (syncError || !cart || items.length === 0 || cart.items.length === 0)) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+      <div className="min-h-[60svh] flex flex-col items-center justify-center text-center px-4">
         <h1 className="text-3xl font-bold mb-4">{syncError ? "Something went wrong" : "Your cart is empty"}</h1>
         <p className="text-on-surface-variant mb-8">{syncError || "Add some products before checking out."}</p>
         <Link href={syncError ? "/cart" : "/products"} className="bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md">
@@ -440,7 +479,11 @@ export default function CheckoutPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                 {[
                   { value: "cod" as const, label: "Cash on Delivery", icon: Truck },
-                  { value: "stripe" as const, label: "Credit / Debit Card", icon: CreditCard },
+                  {
+                    value: "razorpay" as const,
+                    label: "Card / UPI / Netbanking",
+                    icon: CreditCard,
+                  },
                 ].map(({ value, label, icon: Icon }) => (
                   <label
                     key={value}
@@ -462,7 +505,19 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {(paymentMethod === "stripe" || pendingOrder) && <CardFields card={card} onChange={setCard} />}
+            {(paymentMethod === "razorpay" || pendingOrder) && (
+              <div className="border-outline-variant/60 bg-surface rounded-xl border p-4">
+                <p className="text-on-surface font-body-md mb-1">
+                  You&apos;ll pay securely through Razorpay.
+                </p>
+                <p className="text-on-surface-variant font-caption">
+                  Pressing {pendingOrder ? '"Retry Payment"' : '"Place Order & Pay"'} opens
+                  Razorpay&apos;s secure window, where you can pay by card, UPI, netbanking or
+                  wallet. Your card details go straight to Razorpay and are never sent to or
+                  stored by this store.
+                </p>
+              </div>
+            )}
           </section>
         </div>
 
@@ -477,7 +532,7 @@ export default function CheckoutPage() {
                   <li key={item.product._id} className="flex gap-3">
                     <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-surface-container-high shrink-0">
                       {item.product.images?.[0] && (
-                        <Image src={item.product.images[0]} alt="" fill sizes="56px" className="object-cover" />
+                        <ProductImage src={item.product.images[0]} alt="" fill sizes="56px" className="object-cover" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
