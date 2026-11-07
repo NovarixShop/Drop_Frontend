@@ -66,6 +66,7 @@
   --color-on-secondary: var(--on-secondary);
   --color-secondary-container: var(--secondary-container);
   --color-on-secondary-container: var(--on-secondary-container);
+  --color-neutral-slate: #2C3E50;
 }
 
 /* Author utilities are declared with @utility, not inside `@layer utilities`.
@@ -272,7 +273,7 @@
 @layer utilities {
   /* Descendant selectors, so they stay plain layered CSS rather than @utility. */
   .dark .glass-card {
-    background: rgba(33, 49, 69, 0.4);
+    background: rgba(44, 62, 80, 0.4);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
@@ -315,12 +316,11 @@
   --primary-fixed: #e1e0ff;
   --on-primary-fixed: #07006c;
 
-  /* One brand ramp, reused by every gradient so the site reads as one system
-     instead of a different two-stop gradient per section. */
-  --gradient-brand: linear-gradient(135deg, #4648d4 0%, #6d4ae0 45%, #006584 100%);
-  --gradient-brand-soft: linear-gradient(135deg, rgb(70 72 212 / 0.1) 0%, rgb(0 101 132 / 0.08) 100%);
-  --gradient-page: radial-gradient(120% 80% at 50% -10%, rgb(70 72 212 / 0.07) 0%, transparent 60%);
-  --hairline: linear-gradient(to right, transparent, rgb(70 72 212 / 0.28), transparent);
+  /* Neutral Slate (#2C3E50) unified brand ramp */
+  --gradient-brand: linear-gradient(135deg, #2C3E50 0%, #34495E 45%, #1A252F 100%);
+  --gradient-brand-soft: linear-gradient(135deg, rgb(44 62 80 / 0.12) 0%, rgb(52 73 94 / 0.08) 100%);
+  --gradient-page: radial-gradient(120% 80% at 50% -10%, rgb(44 62 80 / 0.08) 0%, transparent 60%);
+  --hairline: linear-gradient(to right, transparent, rgb(44 62 80 / 0.28), transparent);
 }
 
 .dark {
@@ -338,7 +338,7 @@
   
   --primary: #c0c1ff;
   --on-primary: #07006c;
-  --primary-container: #2f2ebe;
+  --primary-container: #2C3E50;
   --on-primary-container: #e1e0ff;
   
   --outline: #c7c4d7;
@@ -349,18 +349,17 @@
 
   --secondary: #7bd1fa;
   --on-secondary: #003547;
-  --secondary-container: #004d66;
+  --secondary-container: #2C3E50;
   --on-secondary-container: #c0e8ff;
 
   --primary-fixed: #e1e0ff;
   --on-primary-fixed: #07006c;
 
-  /* Lifted lightness and lower saturation: the light-theme ramp turns to mud
-     against #0a0e17 and fails contrast for text sitting on it. */
-  --gradient-brand: linear-gradient(135deg, #8f90ff 0%, #a98cff 45%, #7bd1fa 100%);
-  --gradient-brand-soft: linear-gradient(135deg, rgb(143 144 255 / 0.14) 0%, rgb(123 209 250 / 0.1) 100%);
-  --gradient-page: radial-gradient(120% 80% at 50% -10%, rgb(143 144 255 / 0.1) 0%, transparent 60%);
-  --hairline: linear-gradient(to right, transparent, rgb(143 144 255 / 0.3), transparent);
+  /* Neutral Slate (#2C3E50) dark-theme brand ramp */
+  --gradient-brand: linear-gradient(135deg, #2C3E50 0%, #3d566e 45%, #56789a 100%);
+  --gradient-brand-soft: linear-gradient(135deg, rgb(44 62 80 / 0.25) 0%, rgb(61 86 110 / 0.15) 100%);
+  --gradient-page: radial-gradient(120% 80% at 50% -10%, rgb(44 62 80 / 0.22) 0%, transparent 60%);
+  --hairline: linear-gradient(to right, transparent, rgb(61 86 110 / 0.35), transparent);
 }
 
 body {

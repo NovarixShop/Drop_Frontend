@@ -45,7 +45,7 @@ export default function RootLayout({
           <AccountSync />
           <Navbar />
           <SmoothScroll>
-            <main className="flex-1 flex w-full flex-col">
+            <main className="flex-1 flex w-full flex-col pb-20 md:pb-0">
               <RouteTransition>{children}</RouteTransition>
             </main>
           </SmoothScroll>
