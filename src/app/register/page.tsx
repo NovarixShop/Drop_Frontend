@@ -62,7 +62,7 @@ export default function RegisterPage() {
       >
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Create Account</h1>
-          <p className="text-gray-400">Join Drop for premium shopping</p>
+          <p className="text-gray-400">Join NOVARIX for premium shopping</p>
         </div>
 
         {error && (

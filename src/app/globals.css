@@ -362,10 +362,17 @@
   --hairline: linear-gradient(to right, transparent, rgb(61 86 110 / 0.35), transparent);
 }
 
+/* `clip` (not `hidden`) on both html and body: on mobile, `hidden` on body alone still
+   lets touch users pan sideways when content overflows, which drags the fixed
+   MobileBottomBar off-screen. `clip` also doesn't create a scroll container, so the
+   sticky navbar keeps working. */
+html {
+  overflow-x: clip;
+}
 body {
   background-color: var(--color-background);
   color: var(--color-on-background);
-  overflow-x: hidden;
+  overflow-x: clip;
   font-family: var(--font-inter);
   /* A single fixed wash behind every page, instead of each section inventing its own. */
   background-image: var(--gradient-page);

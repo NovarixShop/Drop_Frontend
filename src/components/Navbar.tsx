@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '../store/authStore';
 import { useCartStore } from '../store/cartStore';
@@ -28,8 +29,23 @@ export default function Navbar() {
     >
       <div className="flex justify-between items-center px-4 md:px-6 py-4 max-w-[1440px] mx-auto">
         <div className="flex items-center gap-10">
-          <Link href="/" className="font-headline-lg text-[28px] font-bold tracking-tighter text-on-surface">
-            NOVARIX
+          <Link href="/" className="flex items-center gap-2 group shrink-0" aria-label="NOVARIX Home">
+            <Image
+              src="/logo-dark.png"
+              alt="NOVARIX"
+              width={160}
+              height={50}
+              priority
+              className="h-9 md:h-11 w-auto object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
+            />
+            <Image
+              src="/logo-light.png"
+              alt="NOVARIX"
+              width={160}
+              height={50}
+              priority
+              className="h-9 md:h-11 w-auto object-contain block dark:hidden transition-transform duration-200 group-hover:scale-105"
+            />
           </Link>
           <div className="hidden md:flex items-center gap-6">
             <Link href="/products" className="font-body-md text-on-surface-variant hover:text-primary transition-colors duration-300">

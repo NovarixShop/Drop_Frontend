@@ -20,6 +20,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import MobileBottomBar from "@/components/mobile/MobileBottomBar";
 import AccountSync from "@/components/AccountSync";
 import RouteTransition from "@/components/RouteTransition";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "NOVARIX | Premium E-Commerce",
@@ -45,9 +46,11 @@ export default function RootLayout({
           <AccountSync />
           <Navbar />
           <SmoothScroll>
-            <main className="flex-1 flex w-full flex-col pb-20 md:pb-0">
+            <main className="flex-1 flex w-full flex-col">
               <RouteTransition>{children}</RouteTransition>
             </main>
+            {/* Footer carries the mobile bottom-bar clearance (pb-28 md:pb-0) */}
+            <Footer />
           </SmoothScroll>
           <MobileBottomBar />
           <CartDrawer />
