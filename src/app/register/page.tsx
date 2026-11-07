@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { motion } from 'framer-motion';
-import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 import api, { getErrorMessage } from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -18,15 +18,9 @@ export default function RegisterPage() {
   
   const { register, isLoading, error, clearError } = useAuthStore();
 
-  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+  const handleGoogleSuccess = async (data: { accessToken: string }) => {
     try {
-      if (!credentialResponse.credential) {
-        toast.error('No credential received from Google');
-        return;
-      }
-      const res = await api.post('/auth/google-login', {
-        idToken: credentialResponse.credential,
-      });
+      const res = await api.post('/auth/google-login', data);
       
       useAuthStore.setState({ 
         user: res.data.data.user, 
@@ -98,17 +92,16 @@ export default function RegisterPage() {
           </div>
         )}
 
-        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
-          <div className="flex justify-center mb-6">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              text="signup_with"
-              onError={() => {
-                toast.error('Google Sign Up failed or was cancelled');
-              }}
-            />
-          </div>
-        </GoogleOAuthProvider>
+        <div className="mb-6">
+          <GoogleAuthButton
+            mode="signup"
+            onSuccess={handleGoogleSuccess}
+            onError={() => {
+              toast.error('Google Sign Up was cancelled or failed');
+            }}
+            disabled={isLoading}
+          />
+        </div>
         
         <div className="relative flex items-center py-5">
           <div className="flex-grow border-t border-white/10"></div>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { motion } from 'framer-motion';
-import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 import api, { getErrorMessage } from '@/lib/api'; // assuming api is in lib
 import { toast } from 'sonner';
 
@@ -33,15 +33,9 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+  const handleGoogleSuccess = async (data: { accessToken: string }) => {
     try {
-      if (!credentialResponse.credential) {
-        toast.error('No credential received from Google');
-        return;
-      }
-      const res = await api.post('/auth/google-login', {
-        idToken: credentialResponse.credential,
-      });
+      const res = await api.post('/auth/google-login', data);
       
       // Update auth store with response data
       useAuthStore.setState({ 
@@ -76,16 +70,16 @@ export default function LoginPage() {
           </div>
         )}
 
-        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
-          <div className="flex justify-center mb-6">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => {
-                toast.error('Google Sign In failed');
-              }}
-            />
-          </div>
-        </GoogleOAuthProvider>
+        <div className="mb-6">
+          <GoogleAuthButton
+            mode="signin"
+            onSuccess={handleGoogleSuccess}
+            onError={() => {
+              toast.error('Google Sign In was cancelled or failed');
+            }}
+            disabled={isLoading}
+          />
+        </div>
         
         <div className="relative flex items-center py-5">
           <div className="flex-grow border-t border-white/10"></div>
