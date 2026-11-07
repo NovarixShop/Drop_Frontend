@@ -74,7 +74,7 @@ export default function RouteTransition({ children }: { children: ReactNode }) {
     if (isHome) {
       // Split Screen Reveal
       return (
-        <div key={pathname} className="flex-1 w-full flex flex-col relative overflow-hidden">
+        <div key={pathname} className="flex-1 w-full flex flex-col relative">
           <motion.div
             initial={{ scaleX: 1 }}
             animate={{ scaleX: 0 }}
