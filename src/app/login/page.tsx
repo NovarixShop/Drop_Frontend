@@ -35,6 +35,10 @@ export default function LoginPage() {
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     try {
+      if (!credentialResponse.credential) {
+        toast.error('No credential received from Google');
+        return;
+      }
       const res = await api.post('/auth/google-login', {
         idToken: credentialResponse.credential,
       });
@@ -48,9 +52,10 @@ export default function LoginPage() {
       
       toast.success('Successfully logged in with Google');
       router.push(getRedirectPath());
-    } catch (err) {
+    } catch (err: any) {
       console.error('Google login failed:', err);
-      toast.error('Google login failed. Please try again.');
+      const serverMsg = err?.response?.data?.message || 'Google login failed. Please try again.';
+      toast.error(serverMsg);
     }
   };
 

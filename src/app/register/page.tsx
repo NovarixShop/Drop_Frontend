@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { motion } from 'framer-motion';
+import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
+import api from '@/lib/api';
+import { toast } from 'sonner';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -14,6 +17,31 @@ export default function RegisterPage() {
   const router = useRouter();
   
   const { register, isLoading, error, clearError } = useAuthStore();
+
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    try {
+      if (!credentialResponse.credential) {
+        toast.error('No credential received from Google');
+        return;
+      }
+      const res = await api.post('/auth/google-login', {
+        idToken: credentialResponse.credential,
+      });
+      
+      useAuthStore.setState({ 
+        user: res.data.data.user, 
+        accessToken: res.data.data.accessToken,
+        isAuthenticated: true 
+      });
+      
+      toast.success('Successfully signed in with Google');
+      router.push('/');
+    } catch (err: any) {
+      console.error('Google registration failed:', err);
+      const serverMsg = err?.response?.data?.message || 'Google registration failed. Please try again.';
+      toast.error(serverMsg);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,6 +98,24 @@ export default function RegisterPage() {
             {error}
           </div>
         )}
+
+        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+          <div className="flex justify-center mb-6">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              text="signup_with"
+              onError={() => {
+                toast.error('Google Sign Up failed or was cancelled');
+              }}
+            />
+          </div>
+        </GoogleOAuthProvider>
+        
+        <div className="relative flex items-center py-5">
+          <div className="flex-grow border-t border-white/10"></div>
+          <span className="flex-shrink-0 mx-4 text-gray-500 text-sm">Or register with email</span>
+          <div className="flex-grow border-t border-white/10"></div>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
