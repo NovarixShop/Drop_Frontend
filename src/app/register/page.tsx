@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { motion } from 'framer-motion';
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
-import api from '@/lib/api';
+import api, { getErrorMessage } from '@/lib/api';
 import { toast } from 'sonner';
 
 export default function RegisterPage() {
@@ -36,10 +36,9 @@ export default function RegisterPage() {
       
       toast.success('Successfully signed in with Google');
       router.push('/');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Google registration failed:', err);
-      const serverMsg = err?.response?.data?.message || 'Google registration failed. Please try again.';
-      toast.error(serverMsg);
+      toast.error(getErrorMessage(err, 'Google registration failed. Please try again.'));
     }
   };
 

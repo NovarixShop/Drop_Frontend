@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { motion } from 'framer-motion';
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
-import api from '@/lib/api'; // assuming api is in lib
+import api, { getErrorMessage } from '@/lib/api'; // assuming api is in lib
 import { toast } from 'sonner';
 
 // Where to go after signing in: the ?redirect= path if it stays on this site, otherwise home
@@ -52,10 +52,9 @@ export default function LoginPage() {
       
       toast.success('Successfully logged in with Google');
       router.push(getRedirectPath());
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Google login failed:', err);
-      const serverMsg = err?.response?.data?.message || 'Google login failed. Please try again.';
-      toast.error(serverMsg);
+      toast.error(getErrorMessage(err, 'Google login failed. Please try again.'));
     }
   };
 
