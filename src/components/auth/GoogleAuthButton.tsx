@@ -90,3 +90,4 @@ export default function GoogleAuthButton(props: GoogleAuthButtonProps) {
     </GoogleOAuthProvider>
   );
 }
+
