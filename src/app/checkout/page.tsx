@@ -280,9 +280,11 @@ export default function CheckoutPage() {
 
       if (paymentMethod === "razorpay") {
         if (!(await payWithRazorpay(order))) {
-          // The order is placed and the server cart is cleared; only payment remains
-          setPendingOrder(order);
-          useCartStore.getState().clearCart();
+          // If payment was not completed: cancel the unpaid order immediately so it doesn't get placed!
+          await api.post(`/orders/${order._id}/cancel`).catch(() => {});
+          setPendingOrder(null);
+          // Keep user's cart completely intact so they can retry without losing their items!
+          setPlacing(false);
           return;
         }
       }
@@ -638,14 +640,16 @@ export default function CheckoutPage() {
                     <span>-₹{totals.discount.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span className="text-on-surface">₹{totals.tax.toFixed(2)}</span>
-                </div>
+                {totals.tax > 0 && (
+                  <div className="flex justify-between">
+                    <span>Tax</span>
+                    <span className="text-on-surface">₹{totals.tax.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span className="text-on-surface">
-                    {totals.shipping === 0 ? "Free" : `₹${totals.shipping.toFixed(2)}`}
+                  <span className="text-on-surface font-medium text-[#00C853]">
+                    {totals.shipping === 0 ? "Free (Inclusive)" : `₹${totals.shipping.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-lg font-bold text-on-surface pt-3 border-t border-outline-variant">
