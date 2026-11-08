@@ -34,16 +34,6 @@
   --color-primary-fixed: var(--primary-fixed);
   --color-on-primary-fixed: var(--on-primary-fixed);
 
-  --spacing-unit: 4px;
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 40px;
-  --spacing-xxl: 80px;
-  --spacing-gutter: 24px;
-  --spacing-container-max: 1440px;
-
   --radius-sm: 0.25rem;
   --radius: 0.5rem;
   --radius-md: 0.75rem;
@@ -53,14 +43,6 @@
 
   --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
   --font-inter: "Inter", sans-serif;
-
-  --spacing-stack-sm: 8px;
-  --spacing-stack-md: 16px;
-  --spacing-stack-lg: 24px;
-  --spacing-stack-xl: 40px;
-  --spacing-margin-mobile: 20px;
-  --spacing-gutter-mobile: 12px;
-  --spacing-touch-target-min: 44px;
 
   --color-secondary: var(--secondary);
   --color-on-secondary: var(--on-secondary);

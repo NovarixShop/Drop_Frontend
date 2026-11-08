@@ -88,7 +88,7 @@ export default function Footer() {
         {/* Main Grid: Left Brand & Newsletter + Right 4 Nav Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
           {/* Left Column: Logo + Mission + Newsletter */}
-          <div className="lg:col-span-5 max-w-md">
+          <div className="lg:col-span-5 w-full max-w-[440px]">
             {/* Logo Emblem */}
             <Link href="/" className="inline-block group" aria-label="NOVARIX Home">
               <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden border border-white/10 bg-black/50 shadow-md">
@@ -103,12 +103,12 @@ export default function Footer() {
             </Link>
 
             {/* Brand Mission Statement */}
-            <p className="mt-5 text-xs md:text-sm text-zinc-400 leading-relaxed max-w-sm">
+            <p className="mt-5 text-xs md:text-sm text-zinc-400 leading-relaxed max-w-[380px]">
               NOVARIX is your curated destination for modern technology, everyday luxury, and lifestyle essentials. Engineered for precision, crafted to inspire.
             </p>
 
             {/* Newsletter */}
-            <div className="mt-8 md:mt-10 max-w-sm">
+            <div className="mt-8 md:mt-10 w-full max-w-[380px]">
               <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-white mb-2">
                 STAY IN THE LOOP
               </span>
@@ -122,8 +122,8 @@ export default function Footer() {
                   <span>You&apos;re subscribed! Welcome to NOVARIX.</span>
                 </div>
               ) : (
-                <form onSubmit={handleSubscribe} className="relative">
-                  <div className="flex items-center rounded-full bg-[#10121A] border border-white/10 p-1.5 focus-within:border-indigo-400/60 transition-colors">
+                <form onSubmit={handleSubscribe} className="relative w-full">
+                  <div className="flex items-center w-full rounded-full bg-[#10121A] border border-white/10 p-1.5 focus-within:border-indigo-400/60 transition-colors">
                     <input
                       type="email"
                       required
@@ -135,7 +135,7 @@ export default function Footer() {
                     <button
                       type="submit"
                       aria-label="Subscribe to newsletter"
-                      className="shrink-0 rounded-full bg-[#9D9EF8] hover:bg-[#B3B4FF] text-[#0C0D1E] px-4 py-2 flex items-center justify-center gap-1.5 text-xs font-semibold transition-all shadow-sm active:scale-95"
+                      className="shrink-0 rounded-full bg-[#9D9EF8] hover:bg-[#B3B4FF] text-[#0C0D1E] px-4 py-2 flex items-center justify-center gap-1.5 text-xs font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
                     >
                       <span>Join</span>
                       <ArrowRight className="w-3.5 h-3.5" />
