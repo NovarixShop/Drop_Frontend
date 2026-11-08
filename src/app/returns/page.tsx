@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { RotateCcw, CheckCircle2, AlertCircle, Clock, ShieldCheck, ArrowRight } from 'lucide-react';
+import { RotateCcw, CheckCircle2, Clock, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export default function ReturnsPage() {
   return (

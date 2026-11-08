@@ -13,7 +13,6 @@ import {
   Heart,
   User,
   Package,
-  Gift,
   ChevronDown,
   Sparkles,
 } from 'lucide-react';
@@ -44,9 +43,11 @@ export default function Navbar() {
   }, []);
 
   // Close dropdown on route change
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setUserMenuOpen(false);
-  }, [pathname]);
+  }
 
   const navLinks = [
     { label: 'Products', href: '/products' },

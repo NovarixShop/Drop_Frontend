@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import ProductImage from "@/components/products/ProductImage";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { CheckCircle2, CreditCard, Loader2, MapPin, Truck, Tag, X, Package, ArrowRight } from "lucide-react";
+import { CheckCircle2, CreditCard, Loader2, MapPin, Truck, Tag, X, Package } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { api, getErrorMessage } from "@/lib/api";

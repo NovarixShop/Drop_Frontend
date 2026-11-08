@@ -56,6 +56,8 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT || 22 }}
+          timeout: 60s
+          command_timeout: 15m
           script_stop: true
           script: |
             TARGET_DIR="${{ secrets.HOSTINGER_FRONTEND_DIR || '/var/www/Drop_Frontend' }}"
