@@ -18,6 +18,9 @@ export interface Product {
   images: string[];
   stock: number;
   slug: string;
+  tax?: number;
+  shippingCost?: number;
+  isCodAvailable?: boolean;
 }
 
 interface ProductState {

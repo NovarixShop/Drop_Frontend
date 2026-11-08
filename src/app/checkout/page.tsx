@@ -22,13 +22,24 @@ import {
 } from "@/lib/razorpay";
 
 interface ServerCartItem {
-  product: { _id: string; name: string; price: number; images: string[]; stock: number; isActive: boolean };
+  product: {
+    _id: string;
+    name: string;
+    price: number;
+    images: string[];
+    stock: number;
+    isActive: boolean;
+    tax?: number;
+    shippingCost?: number;
+    isCodAvailable?: boolean;
+  };
   quantity: number;
 }
 
 interface ServerCart {
   items: ServerCartItem[];
   couponCode?: string | null;
+  isCodAvailable?: boolean;
   totals: { subtotal: number; discount: number; tax: number; shipping: number; grandTotal: number };
 }
 
@@ -116,6 +127,12 @@ export default function CheckoutPage() {
   const [pendingOrder, setPendingOrder] = useState<PlacedOrder | null>(null);
   const [completedOrder, setCompletedOrder] = useState<PlacedOrder | null>(null);
 
+  const isCodAllowed = cart
+    ? cart.isCodAvailable !== false &&
+      !cart.items.some((i) => i.product.isCodAvailable === false)
+    : true;
+  const effectivePaymentMethod: PaymentMethod = !isCodAllowed && paymentMethod === "cod" ? "razorpay" : paymentMethod;
+
   useEffect(() => {
     if (hydrated && !isAuthenticated) router.replace("/login?redirect=/checkout");
   }, [hydrated, isAuthenticated, router]);
@@ -123,10 +140,10 @@ export default function CheckoutPage() {
   // Fetch checkout.js up front once card is selected, so pressing Pay opens the overlay
   // immediately instead of waiting on a network round trip. Failures surface at pay time.
   useEffect(() => {
-    if (paymentMethod === "razorpay" || pendingOrder) {
+    if (effectivePaymentMethod === "razorpay" || pendingOrder) {
       loadRazorpayCheckout().catch(() => {});
     }
-  }, [paymentMethod, pendingOrder]);
+  }, [effectivePaymentMethod, pendingOrder]);
 
   useEffect(() => {
     const localItems = useCartStore.getState().items;
@@ -273,12 +290,12 @@ export default function CheckoutPage() {
       }
 
       const res = await api.post("/orders/checkout", {
-        paymentMethod,
+        paymentMethod: effectivePaymentMethod,
         shippingAddress: { street, city, state, postalCode, country },
       });
       const order: PlacedOrder = res.data.data.order;
 
-      if (paymentMethod === "razorpay") {
+      if (effectivePaymentMethod === "razorpay") {
         if (!(await payWithRazorpay(order))) {
           // If payment was not completed: cancel the unpaid order immediately so it doesn't get placed!
           await api.post(`/orders/${order._id}/cancel`).catch(() => {});
@@ -496,34 +513,51 @@ export default function CheckoutPage() {
             {!pendingOrder && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                 {[
-                  { value: "cod" as const, label: "Cash on Delivery", icon: Truck },
+                  {
+                    value: "cod" as const,
+                    label: "Cash on Delivery",
+                    icon: Truck,
+                    disabled: !isCodAllowed,
+                    badge: !isCodAllowed ? "Unavailable for cart items" : undefined,
+                  },
                   {
                     value: "razorpay" as const,
                     label: "Card / UPI / Netbanking",
                     icon: CreditCard,
+                    disabled: false,
                   },
-                ].map(({ value, label, icon: Icon }) => (
+                ].map(({ value, label, icon: Icon, disabled, badge }) => (
                   <label
                     key={value}
-                    className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${
-                      paymentMethod === value ? "border-primary bg-primary/5" : "border-outline-variant"
+                    className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${
+                      disabled
+                        ? "opacity-50 cursor-not-allowed border-outline-variant/40 bg-surface-container-high/30"
+                        : effectivePaymentMethod === value
+                        ? "border-primary bg-primary/5 cursor-pointer"
+                        : "border-outline-variant cursor-pointer"
                     }`}
                   >
                     <input
                       type="radio"
                       name="payment"
-                      checked={paymentMethod === value}
-                      onChange={() => setPaymentMethod(value)}
-                      className="accent-[var(--color-primary)]"
+                      disabled={disabled}
+                      checked={effectivePaymentMethod === value}
+                      onChange={() => {
+                        if (!disabled) setPaymentMethod(value);
+                      }}
+                      className="accent-[var(--color-primary)] disabled:opacity-40"
                     />
-                    <Icon size={18} className="text-on-surface-variant" />
-                    <span className="text-on-surface font-body-md">{label}</span>
+                    <Icon size={18} className="text-on-surface-variant shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-on-surface font-body-md block">{label}</span>
+                      {badge && <span className="text-[11px] text-amber-500 font-caption block mt-0.5">{badge}</span>}
+                    </div>
                   </label>
                 ))}
               </div>
             )}
 
-            {(paymentMethod === "razorpay" || pendingOrder) && (
+            {(effectivePaymentMethod === "razorpay" || pendingOrder) && (
               <div className="border-outline-variant/60 bg-surface rounded-xl border p-4">
                 <p className="text-on-surface font-body-md mb-1">
                   You&apos;ll pay securely through Razorpay.

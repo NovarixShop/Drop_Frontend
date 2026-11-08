@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Heart, Minus, Plus, Star, ArrowLeft, ShoppingBag } from "lucide-react";
+import { Heart, Minus, Plus, Star, ArrowLeft, ShoppingBag, Truck, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { api, getErrorMessage } from "@/lib/api";
@@ -26,6 +26,9 @@ interface ProductDetail {
   averageRating?: number;
   totalReviews?: number;
   category?: { name: string; slug: string } | string;
+  tax?: number;
+  shippingCost?: number;
+  isCodAvailable?: boolean;
 }
 
 interface Review {
@@ -230,7 +233,7 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          <div className="flex items-baseline gap-3 mb-6">
+          <div className="flex items-baseline gap-3 mb-4">
             <span className="text-3xl font-bold text-[#00C853]">₹{product.price.toFixed(2)}</span>
             {product.compareAtPrice && product.compareAtPrice > product.price && (
               <>
@@ -242,6 +245,32 @@ export default function ProductDetailPage() {
                 </span>
               </>
             )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 mb-6 text-xs text-on-surface-variant">
+            <span className="px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline-variant/30 flex items-center gap-1.5">
+              <Truck size={13} className="text-primary" />
+              {!product.shippingCost || product.shippingCost === 0
+                ? "Free Delivery"
+                : `₹${product.shippingCost} Delivery`}
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline-variant/30 flex items-center gap-1.5">
+              <ShieldCheck size={13} className="text-primary" />
+              {!product.tax || product.tax === 0 ? "Taxes Included" : `+₹${product.tax} Tax`}
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline-variant/30 flex items-center gap-1.5">
+              {product.isCodAvailable !== false ? (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00C853]" />
+                  <span>COD Available</span>
+                </>
+              ) : (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  <span>Prepaid Only</span>
+                </>
+              )}
+            </span>
           </div>
 
           <p className="text-on-surface-variant font-body-md whitespace-pre-line mb-8">{product.description}</p>
