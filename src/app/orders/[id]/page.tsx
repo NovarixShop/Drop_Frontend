@@ -232,7 +232,7 @@ export default function OrderDetailPage() {
           </h2>
           {tracking ? (
             <>
-              {order.orderStatus !== "cancelled" && order.orderStatus !== "delivered" && (
+              {order.orderStatus !== "cancelled" && order.orderStatus !== "delivered" && tracking.estimatedDelivery && (
                 <p className="text-on-surface-variant font-caption mb-6">
                   {tracking.carrier} · Estimated delivery {new Date(tracking.estimatedDelivery).toLocaleDateString()}
                 </p>
@@ -242,7 +242,7 @@ export default function OrderDetailPage() {
                   <li key={`${cp.status}-${idx}`} className="ml-6">
                     <span
                       className={`absolute -left-[7px] w-3.5 h-3.5 rounded-full ${
-                        idx === tracking.checkpoints.length - 1 ? "bg-primary" : "bg-outline-variant"
+                        idx === 0 ? "bg-primary ring-4 ring-primary/20 shadow-sm shadow-primary/50" : "bg-outline-variant"
                       }`}
                     />
                     <p className="font-bold text-on-surface">{cp.status}</p>
