@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import ProductImage from "@/components/products/ProductImage";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { CheckCircle2, CreditCard, Loader2, MapPin, Truck, Tag, X } from "lucide-react";
+import { CheckCircle2, CreditCard, Loader2, MapPin, Truck, Tag, X, Package, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { api, getErrorMessage } from "@/lib/api";
@@ -330,17 +330,33 @@ export default function CheckoutPage() {
             <span className="font-bold">₹{completedOrder.totals.grandTotal.toFixed(2)}</span>
           </div>
         </div>
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex flex-col sm:flex-row justify-center gap-3">
           <Link
             href={`/orders/${completedOrder._id}`}
-            className="inline-block border border-outline-variant text-on-surface px-8 py-4 rounded-xl font-label-md hover:border-primary"
+            className="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-7 py-3.5 rounded-xl font-label-md hover:opacity-90 shadow-lg shadow-primary/20 transition-all"
           >
-            View Order
+            <Package size={18} /> View Order Details
           </Link>
-          <Link href="/products" className="inline-block bg-primary text-on-primary px-8 py-4 rounded-xl font-label-md">
+          <Link
+            href="/orders"
+            className="inline-flex items-center justify-center gap-2 border border-outline-variant text-on-surface px-7 py-3.5 rounded-xl font-label-md hover:border-primary hover:text-primary transition-all"
+          >
+            My Orders Dashboard
+          </Link>
+          <Link
+            href="/products"
+            className="inline-flex items-center justify-center gap-2 border border-outline-variant text-on-surface-variant px-6 py-3.5 rounded-xl font-label-md hover:border-primary hover:text-primary transition-all"
+          >
             Continue Shopping
           </Link>
         </div>
+        <p className="text-xs text-on-surface-variant mt-8">
+          You can track shipping updates and invoices anytime in the{" "}
+          <Link href="/orders" className="text-primary font-semibold underline underline-offset-4 hover:opacity-80">
+            My Orders
+          </Link>{" "}
+          dashboard.
+        </p>
       </motion.div>
     );
   }
