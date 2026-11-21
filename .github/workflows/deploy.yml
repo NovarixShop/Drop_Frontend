@@ -76,12 +76,24 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             
+            echo "🔍 Checking disk space on Hostinger VPS..."
+            df -h
+
+            # If /swapfile was created and exhausted disk space, release it
+            if [ -f /swapfile ]; then
+              echo "Removing /swapfile to restore free disk space..."
+              swapoff /swapfile 2>/dev/null || true
+              rm -f /swapfile 2>/dev/null || true
+            fi
+            rm -rf /tmp/* /root/.npm/_cacache /home/ubuntu/.npm/_cacache 2>/dev/null || true
+            df -h
+
             echo "📦 Clearing stale Next build artifacts..."
             rm -rf .next
 
             export NODE_OPTIONS="--max-old-space-size=1536"
             npm install --prefer-offline --no-audit --no-fund
-            npx next build --webpack || npm run build
+            npm run build
             
             echo "🔄 Restarting application across PM2 / systemd / port 3000..."
             if command -v pm2 >/dev/null 2>&1; then
