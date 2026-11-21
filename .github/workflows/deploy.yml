@@ -78,7 +78,17 @@ jobs:
             
             echo "📦 Clearing stale Next cache and compiling fresh production build..."
             rm -rf .next/cache
-            npm ci
+
+            # Ensure adequate swap exists on the VPS so builds never get killed by OOM
+            if [ ! -f /swapfile ] && command -v fallocate >/dev/null 2>&1; then
+              fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048 2>/dev/null || true
+              chmod 600 /swapfile 2>/dev/null || true
+              mkswap /swapfile 2>/dev/null || true
+              swapon /swapfile 2>/dev/null || true
+            fi
+
+            export NODE_OPTIONS="--max-old-space-size=1536"
+            npm install --prefer-offline --no-audit --no-fund || npm ci
             npm run build
             
             echo "🔄 Restarting application across PM2 / systemd / port 3000..."
