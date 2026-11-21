@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 import api, { getErrorMessage } from '@/lib/api';
 import { toast } from 'sonner';
+import { X } from 'lucide-react';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -79,8 +80,23 @@ export default function RegisterPage() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-[448px] bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm"
+        className="w-full max-w-[448px] bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm relative"
       >
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== 'undefined' && window.history.length > 1) {
+              router.back();
+            } else {
+              router.push('/');
+            }
+          }}
+          aria-label="Close"
+          className="absolute top-5 right-5 p-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Create Account</h1>
           <p className="text-gray-400">Join NOVARIX for premium shopping</p>
