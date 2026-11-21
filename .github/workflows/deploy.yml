@@ -81,7 +81,7 @@ jobs:
 
             export NODE_OPTIONS="--max-old-space-size=1536"
             npm install --prefer-offline --no-audit --no-fund
-            npx next build || npm run build
+            npx next build --webpack || npm run build
             
             echo "🔄 Restarting application across PM2 / systemd / port 3000..."
             if command -v pm2 >/dev/null 2>&1; then
