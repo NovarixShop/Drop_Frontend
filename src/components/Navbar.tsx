@@ -73,7 +73,7 @@ export default function Navbar() {
               width={160}
               height={50}
               priority
-              className="h-9 md:h-11 w-auto object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
+              className="h-10 md:h-12 w-auto object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
             />
             <Image
               src="/logo-light.png"
@@ -81,7 +81,7 @@ export default function Navbar() {
               width={160}
               height={50}
               priority
-              className="h-9 md:h-11 w-auto object-contain block dark:hidden transition-transform duration-200 group-hover:scale-105"
+              className="h-10 md:h-12 w-auto object-contain block dark:hidden transition-transform duration-200 group-hover:scale-105"
             />
           </Link>
           <div className="hidden md:flex items-center gap-5 lg:gap-7">

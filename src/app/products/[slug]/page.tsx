@@ -29,6 +29,9 @@ interface ProductDetail {
   tax?: number;
   shippingCost?: number;
   isCodAvailable?: boolean;
+  lowStockThreshold?: number;
+  sizes?: string[];
+  colors?: string[];
 }
 
 interface Review {
@@ -62,6 +65,8 @@ export default function ProductDetailPage() {
   const [loadError, setLoadError] = useState<"notFound" | "unreachable" | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
 
   const [reviews, setReviews] = useState<Review[]>([]);
   const [rating, setRating] = useState(5);
@@ -77,7 +82,18 @@ export default function ProductDetailPage() {
       setReviews([]);
       try {
         const res = await api.get(`/products/slug/${encodeURIComponent(slug)}`);
-        setProduct(res.data.data.product);
+        const p: ProductDetail = res.data.data.product;
+        setProduct(p);
+        if (p.sizes && p.sizes.length > 0) {
+          setSelectedSize(p.sizes[0]);
+        } else {
+          setSelectedSize('');
+        }
+        if (p.colors && p.colors.length > 0) {
+          setSelectedColor(p.colors[0]);
+        } else {
+          setSelectedColor('');
+        }
       } catch (err) {
         // Only a 404 means this product genuinely isn't in the catalogue. Anything else
         // (API not running, wrong NEXT_PUBLIC_API_URL, CORS, 5xx) is an infrastructure
@@ -163,6 +179,8 @@ export default function ProductDetailPage() {
       price: product.price,
       quantity: Math.min(quantity, maxAddable),
       image: product.images?.[0] || "",
+      size: selectedSize || undefined,
+      color: selectedColor || undefined,
     });
     setQuantity(1);
     toast.success(`${product.name} added to cart`, {
@@ -273,14 +291,74 @@ export default function ProductDetailPage() {
             </span>
           </div>
 
-          <p className="text-on-surface-variant font-body-md whitespace-pre-line mb-8">{product.description}</p>
+          <p className="text-on-surface-variant font-body-md whitespace-pre-line mb-6 leading-relaxed">{product.description}</p>
 
-          <p className={`font-label-md mb-4 ${product.stock > 0 ? "text-[#00C853]" : "text-red-500"}`}>
+          {/* Size Variant Selector */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="mb-5 p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-label-md uppercase tracking-wider text-xs font-bold text-on-surface">Select Size</span>
+                {selectedSize && (
+                  <span className="text-xs text-primary font-semibold">Selected: {selectedSize}</span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2.5">
+                {product.sizes.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setSelectedSize(s)}
+                    className={`min-w-[44px] px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
+                      selectedSize === s
+                        ? "bg-primary text-white border-primary shadow-md shadow-primary/25 scale-105"
+                        : "bg-surface text-on-surface border-outline-variant/50 hover:border-primary/60"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Color Variant Selector */}
+          {product.colors && product.colors.length > 0 && (
+            <div className="mb-5 p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-label-md uppercase tracking-wider text-xs font-bold text-on-surface">Select Color</span>
+                {selectedColor && (
+                  <span className="text-xs text-primary font-semibold">Selected: {selectedColor}</span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2.5">
+                {product.colors.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setSelectedColor(c)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold border flex items-center gap-2 transition-all ${
+                      selectedColor === c
+                        ? "bg-primary/15 text-primary border-primary font-bold shadow-sm"
+                        : "bg-surface text-on-surface border-outline-variant/50 hover:border-primary/60"
+                    }`}
+                  >
+                    <span
+                      className="w-3 h-3 rounded-full border border-white/20 inline-block shadow-sm"
+                      style={{ backgroundColor: c.toLowerCase().replace(/\s+/g, '') }}
+                    />
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <p className={`font-label-md mb-4 font-semibold ${product.stock > 0 ? (product.stock <= (product.lowStockThreshold || 5) ? "text-amber-400" : "text-[#00C853]") : "text-red-500"}`}>
             {product.stock === 0
               ? "Out of stock"
-              : product.stock <= 5
-              ? `Only ${product.stock} left in stock`
-              : "In stock"}
+              : product.stock <= (product.lowStockThreshold || 5)
+              ? `🔥 Only ${product.stock} left in stock - order soon!`
+              : "✓ In stock"}
           </p>
 
           <div className="flex flex-wrap items-center gap-4 mb-4">

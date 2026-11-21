@@ -53,50 +53,67 @@ export default function CartPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-6">
-              {items.map((item, index) => (
-                <motion.div 
-                  key={item.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex gap-6 bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5"
-                >
-                  <div className="relative w-32 h-32 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0">
-                    <ProductImage sizes="128px" src={item.image} alt={item.name} fill className="object-cover" />
-                  </div>
-                  
-                  <div className="flex-1 flex flex-col justify-between py-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-bold text-lg text-black dark:text-white">{item.name}</h3>
-                        <p className="text-accent font-medium">₹{item.price.toFixed(2)}</p>
+              {items.map((item, index) => {
+                const itemKey = `${item.id}-${item.size || ''}-${item.color || ''}`;
+                return (
+                  <motion.div 
+                    key={itemKey}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex gap-6 bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5"
+                  >
+                    <div className="relative w-32 h-32 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shrink-0">
+                      <ProductImage sizes="128px" src={item.image} alt={item.name} fill className="object-cover" />
+                    </div>
+                    
+                    <div className="flex-1 flex flex-col justify-between py-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-lg text-black dark:text-white">{item.name}</h3>
+                          {(item.size || item.color) && (
+                            <div className="flex flex-wrap gap-2 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                              {item.size && (
+                                <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 font-medium">
+                                  Size: {item.size}
+                                </span>
+                              )}
+                              {item.color && (
+                                <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 font-medium">
+                                  Color: {item.color}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          <p className="text-accent font-medium mt-1">₹{item.price.toFixed(2)}</p>
+                        </div>
+                        <button 
+                          onClick={() => removeItem(item.id, item.size, item.color)}
+                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 size={20} />
+                        </button>
                       </div>
-                      <button 
-                        onClick={() => removeItem(item.id)}
-                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
 
-                    <div className="flex items-center gap-4 bg-gray-100 dark:bg-zinc-800 w-fit rounded-lg p-1">
-                      <button 
-                        onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                        className="p-1 hover:bg-white dark:hover:bg-zinc-700 rounded transition-colors"
-                      >
-                        <Minus size={16} />
-                      </button>
-                      <span className="w-8 text-center font-medium">{item.quantity}</span>
-                      <button 
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="p-1 hover:bg-white dark:hover:bg-zinc-700 rounded transition-colors"
-                      >
-                        <Plus size={16} />
-                      </button>
+                      <div className="flex items-center gap-4 bg-gray-100 dark:bg-zinc-800 w-fit rounded-lg p-1">
+                        <button 
+                          onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1), item.size, item.color)}
+                          className="p-1 hover:bg-white dark:hover:bg-zinc-700 rounded transition-colors"
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="w-8 text-center font-medium">{item.quantity}</span>
+                        <button 
+                          onClick={() => updateQuantity(item.id, item.quantity + 1, item.size, item.color)}
+                          className="p-1 hover:bg-white dark:hover:bg-zinc-700 rounded transition-colors"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
 
             {/* Order Summary */}

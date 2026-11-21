@@ -166,6 +166,36 @@ function ProductsPageContent() {
           </div>
         </motion.header>
 
+        {/* Horizontal Category Pills Bar (Browse Individually) */}
+        <div className="mb-10 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <button
+            onClick={() => setFilter('category', null)}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+              !filters.category
+                ? 'bg-primary text-white shadow-md shadow-primary/25 scale-105'
+                : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/30'
+            }`}
+          >
+            All Products
+          </button>
+          {categories.map((cat) => {
+            const isSelected = filters.category === cat.slug;
+            return (
+              <button
+                key={cat._id}
+                onClick={() => handleCategoryChange(cat.slug)}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap capitalize ${
+                  isSelected
+                    ? 'bg-primary text-white shadow-md shadow-primary/25 scale-105'
+                    : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/30'
+                }`}
+              >
+                {cat.name}
+              </button>
+            );
+          })}
+        </div>
+
         {/* Product Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-x-8 gap-y-12">
@@ -202,6 +232,18 @@ function ProductsPageContent() {
                           <div className="w-full h-full flex items-center justify-center text-on-surface-variant/50">No Image</div>
                         )}
                       </Link>
+
+                      {/* Stock Badges */}
+                      {product.stock !== undefined && product.stock <= (product.lowStockThreshold || 5) && product.stock > 0 && (
+                        <span className="absolute top-4 left-4 z-20 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-lg bg-amber-500/90 text-black backdrop-blur-sm shadow-md animate-pulse">
+                          Only {product.stock} left!
+                        </span>
+                      )}
+                      {product.stock === 0 && (
+                        <span className="absolute top-4 left-4 z-20 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-lg bg-rose-600/90 text-white backdrop-blur-sm shadow-md">
+                          Out of Stock
+                        </span>
+                      )}
                       
                       <button 
                         onClick={(e) => {
@@ -252,12 +294,12 @@ function ProductsPageContent() {
                     
                     <div className="flex flex-col gap-2 flex-grow px-2">
                       <div className="flex justify-between items-start gap-4">
-                        <Link href={productHref(product.slug) ?? "/products"}>
-                          <h3 className="font-body-md font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1">
+                        <Link href={productHref(product.slug) ?? "/products"} className="flex-1 min-w-0">
+                          <h3 className="font-body-md font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-2 min-h-[2.5rem]">
                             {product.name}
                           </h3>
                         </Link>
-                        <div className="flex items-center gap-2 bg-surface-container-low px-2 py-1 rounded-md">
+                        <div className="flex items-center gap-2 bg-surface-container-low px-2 py-1 rounded-md shrink-0">
                           <p className="font-label-md text-[#00C853] font-bold whitespace-nowrap">
                             ₹{product.price.toFixed(2)}
                           </p>
@@ -268,7 +310,7 @@ function ProductsPageContent() {
                           )}
                         </div>
                       </div>
-                      <p className="text-on-surface-variant font-caption line-clamp-2 mt-1">
+                      <p className="text-on-surface-variant font-caption line-clamp-3 mt-1 leading-relaxed">
                         {product.description}
                       </p>
                     </div>

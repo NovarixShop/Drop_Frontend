@@ -34,6 +34,8 @@ interface ServerCartItem {
     isCodAvailable?: boolean;
   };
   quantity: number;
+  size?: string;
+  color?: string;
 }
 
 interface ServerCart {
@@ -83,7 +85,12 @@ const syncCartToServer = async (localItems: CartItem[]): Promise<{ cart: ServerC
     try {
       const existing = serverQty.get(item.id);
       if (existing === undefined) {
-        await api.post("/cart", { productId: item.id, quantity: item.quantity });
+        await api.post("/cart", {
+          productId: item.id,
+          quantity: item.quantity,
+          size: item.size || '',
+          color: item.color || '',
+        });
       } else if (existing !== item.quantity) {
         await api.put(`/cart/${item.id}`, { quantity: item.quantity });
       }
@@ -589,7 +596,11 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-body-md text-on-surface line-clamp-1">{item.product.name}</p>
-                      <p className="font-caption text-on-surface-variant">Qty {item.quantity}</p>
+                      <div className="flex flex-wrap items-center gap-2 font-caption text-on-surface-variant">
+                        <span>Qty {item.quantity}</span>
+                        {item.size && <span>• Size {item.size}</span>}
+                        {item.color && <span>• Color {item.color}</span>}
+                      </div>
                     </div>
                     <span className="font-body-md text-on-surface">
                       ₹{(item.product.price * item.quantity).toFixed(2)}

@@ -21,6 +21,9 @@ export interface Product {
   tax?: number;
   shippingCost?: number;
   isCodAvailable?: boolean;
+  lowStockThreshold?: number;
+  sizes?: string[];
+  colors?: string[];
 }
 
 interface ProductState {

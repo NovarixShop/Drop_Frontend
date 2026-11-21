@@ -57,46 +57,65 @@ export function CartDrawer() {
                   </button>
                 </div>
               ) : (
-                items.map((item) => (
-                  <div key={item.id} className="flex gap-4 p-4 rounded-xl bg-surface-container-low border border-outline-variant/30">
-                    <div className="relative w-20 h-24 rounded-lg overflow-hidden bg-surface-container shrink-0">
-                      {item.image ? (
-                        <ProductImage sizes="96px" src={item.image} alt={item.name} fill className="object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs opacity-50">No Img</div>
-                      )}
-                    </div>
-                    <div className="flex-1 flex flex-col justify-between">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-label-md text-on-surface line-clamp-2 pr-2">{item.name}</h4>
-                        <button 
-                          onClick={() => removeItem(item.id)}
-                          className="text-on-surface-variant hover:text-error transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                items.map((item) => {
+                  const itemKey = `${item.id}-${item.size || ''}-${item.color || ''}`;
+                  return (
+                    <div key={itemKey} className="flex gap-4 p-4 rounded-xl bg-surface-container-low border border-outline-variant/30">
+                      <div className="relative w-20 h-24 rounded-lg overflow-hidden bg-surface-container shrink-0">
+                        {item.image ? (
+                          <ProductImage sizes="96px" src={item.image} alt={item.name} fill className="object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs opacity-50">No Img</div>
+                        )}
                       </div>
-                      <div className="flex justify-between items-end mt-2">
-                        <p className="font-label-md text-primary font-bold">₹{item.price.toFixed(2)}</p>
-                        <div className="flex items-center gap-3 bg-surface border border-outline-variant rounded-full px-2 py-1">
+                      <div className="flex-1 flex flex-col justify-between">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h4 className="font-label-md text-on-surface line-clamp-2 pr-2">{item.name}</h4>
+                            {(item.size || item.color) && (
+                              <div className="flex flex-wrap gap-1.5 mt-1 text-[11px] text-on-surface-variant">
+                                {item.size && (
+                                  <span className="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">
+                                    Size: {item.size}
+                                  </span>
+                                )}
+                                {item.color && (
+                                  <span className="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">
+                                    Color: {item.color}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
                           <button 
-                            onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                            className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface"
+                            onClick={() => removeItem(item.id, item.size, item.color)}
+                            className="text-on-surface-variant hover:text-error transition-colors"
                           >
-                            -
+                            <Trash2 className="w-4 h-4" />
                           </button>
-                          <span className="font-label-md min-w-[1ch] text-center text-on-surface">{item.quantity}</span>
-                          <button 
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface"
-                          >
-                            +
-                          </button>
+                        </div>
+                        <div className="flex justify-between items-end mt-2">
+                          <p className="font-label-md text-primary font-bold">₹{item.price.toFixed(2)}</p>
+                          <div className="flex items-center gap-3 bg-surface border border-outline-variant rounded-full px-2 py-1">
+                            <button 
+                              onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1), item.size, item.color)}
+                              className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface"
+                            >
+                              -
+                            </button>
+                            <span className="font-label-md min-w-[1ch] text-center text-on-surface">{item.quantity}</span>
+                            <button 
+                              onClick={() => updateQuantity(item.id, item.quantity + 1, item.size, item.color)}
+                              className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
 

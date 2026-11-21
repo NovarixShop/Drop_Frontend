@@ -212,6 +212,19 @@ export default function Home() {
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-on-surface-variant/50">No image</div>
                       )}
+
+                      {/* Low Stock Badge */}
+                      {product.stock !== undefined && product.stock <= (product.lowStockThreshold || 5) && product.stock > 0 && (
+                        <span className="absolute top-4 left-4 z-20 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-lg bg-amber-500/90 text-black backdrop-blur-sm shadow-md animate-pulse">
+                          Only {product.stock} left!
+                        </span>
+                      )}
+                      {product.stock === 0 && (
+                        <span className="absolute top-4 left-4 z-20 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-lg bg-rose-600/90 text-white backdrop-blur-sm shadow-md">
+                          Out of Stock
+                        </span>
+                      )}
+
                       <button 
                         onClick={(e) => {
                           e.preventDefault();
@@ -256,8 +269,8 @@ export default function Home() {
                       </button>
                     </div>
                       <div className="flex justify-between items-start gap-4">
-                        <h3 className="font-body-md font-semibold text-on-surface group-hover:text-primary transition-colors line-clamp-1">{product.name}</h3>
-                        <div className="flex items-center gap-2">
+                        <h3 className="font-body-md font-semibold text-on-surface group-hover:text-primary transition-colors line-clamp-2 min-h-[2.5rem] flex-1">{product.name}</h3>
+                        <div className="flex items-center gap-2 shrink-0">
                           <p className="text-[#00C853] font-label-md font-bold whitespace-nowrap">₹{product.price.toFixed(2)}</p>
                           {product.compareAtPrice && product.compareAtPrice > product.price && (
                             <p className="text-on-surface-variant font-label-md line-through opacity-60 text-xs whitespace-nowrap">
