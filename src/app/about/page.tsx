@@ -2,8 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Sparkles, Hexagon, Fingerprint } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Hexagon, Fingerprint } from 'lucide-react';
 
 export default function AboutPage() {
   return (
@@ -24,10 +23,6 @@ export default function AboutPage() {
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="lg:col-span-7 relative z-20"
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <span className="font-label-md text-zinc-300 uppercase tracking-[0.2em] text-xs">ESTABLISHED 2024</span>
-                </div>
                 <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 md:mb-8 break-words bg-clip-text text-transparent bg-gradient-to-br from-white via-zinc-200 to-zinc-600">
                   Defining the architecture of modern luxury.
                 </h1>
@@ -153,7 +148,7 @@ export default function AboutPage() {
           </section>
 
           {/* Our Manifesto: Text Heavy Editorial */}
-          <section className="py-16 md:py-48 max-w-5xl mx-auto px-4 sm:px-6 text-center relative">
+          <section className="py-16 md:py-32 max-w-5xl mx-auto px-4 sm:px-6 text-center relative">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[300px] bg-primary/10 blur-[150px] rounded-full pointer-events-none" />
             
             <motion.h2 
@@ -177,63 +172,7 @@ export default function AboutPage() {
               <p className="text-zinc-500">
                 From the molecular structure of our aerospace-grade alloys to the ethically sourced organic textiles woven into our garments, our material science is as rigorous as our design ethos. We do not chase seasonal trends; we architect enduring icons designed to outlive their creators.
               </p>
-              <div className="pt-8 md:pt-16 flex justify-center">
-                <Link href="#" className="text-white font-medium inline-flex items-center justify-center text-center text-base gap-3 group hover:bg-white/10 transition-all px-6 py-4 md:px-10 md:py-5 border border-white/20 rounded-full bg-white/5 backdrop-blur-md">
-                  Examine our 2024 Transparency Report 
-                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-2" />
-                </Link>
-              </div>
             </motion.div>
-          </section>
-
-          {/* Team / Leadership Section */}
-          <section className="pt-16 pb-16 md:py-48 md:mt-20 relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black pointer-events-none" />
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 relative z-10">
-              <motion.h2 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-3xl sm:text-5xl md:text-6xl font-bold mb-10 md:mb-24 text-center tracking-tight text-white"
-              >
-                The Visionaries
-              </motion.h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-                {[
-                  { name: "Elena Vane", role: "Creative Director", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCoFxuiKnim2RbCcfLRZ3F9NWeY5xAIoeKzHfAfQp-zMfIa4SFCObuSufbrhsFkJG4NOrY-0nlLhsOcYccByxB-TQxAJN3RogRlM20F9x2SokIoF_-7PEgASk1J4tBZxwEEsdFNDtTC0NRfzWgFL3tMZbiKjncJwj7ciEM2SxMP1dCpBvfAHeeTZl4_FxOGaw0lIvmJpRXbZNz9AzLB83sOM_BViCtNnLAXrr1udL4WxRtHkpIVgrik" },
-                  { name: "Marcus Thorne", role: "Head of Product", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDNdB4r2DG7OtNiolk6oUco4XCMGY2lNFSZDhx0fke9CbjwzQm2pWYrTWrvq9onemWRsSJdKp3UIeIf15aFQvjP-toksICPWupW8ljsc3e_19l2dWrPP2tEQQNJQmzb50ZcMcguq-9epE8O6b9bgvnDRArx4inYZzCt2GWIsQCWrvx0VCsDhKWkZjqjVcGt_iUI9jiwoFDGhzb2iQgw6_VS4ONX1A6w_9zghCQsfgGnSYrZhrmaI-yU" }, // Reusing an image as placeholder for aesthetics
-                  { name: "Sarah Lin", role: "Chief Technology Officer", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDzGfZH-w_NcpmrPCH9U16Vwr7d5sfbXWwUz-5ncNPa8r37v4_ZnXslguXG0WmWYyAkywO23voEeyIYnNesu_gwL14IJFfZPhMPmijDC5PknDANeBo2jcZ-QZ1pT6BmIiDiIOPMe5ErFwkHuzSn5U42e4L2TnwB5qxxxQhIhkJvO3AmFvSHSsFp1H0qVMbiAkMGCuJFC6FduAp1Nq5pkCiad-CvOAFiPaF2ibK7lc6puPyeLCWbDl5U" },
-                  { name: "David Chen", role: "Lead Designer", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuC30Aeaz4C1rX3wEfM_7rj84f4iQ1rd5YGUyZCik2XezFQL_4htsArSqQh914WIHyMunHvgGcmccjByu-a6ZL0TuYoo9KkAZL6YsqCsXx18joTy3A7_X8Y0ce-1zuIE2NFISzX7JhTrfwKTmhbd6hPsi_oi8Capoqw8J2Fv1UBKm7fONc9AM1jX-t6GFEnx66iNuzPYd81pNRMUNN0WDmmH3xysIvEjm4TKOub6vEjfICbkezZFYDJ6" }
-                ].map((member, idx) => (
-                  <motion.div 
-                    key={idx}
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ delay: idx * 0.15 }}
-                    className="group cursor-pointer"
-                  >
-                    <div className="aspect-[3/4] rounded-[2rem] overflow-hidden mb-4 md:mb-8 relative border border-white/10 shadow-2xl">
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
-                      {member.img ? (
-                        <Image 
-                          src={member.img}
-                          alt={member.name}
-                          fill
-                          className="object-cover transition-transform duration-[1.5s] group-hover:scale-110 saturate-[0.7] group-hover:saturate-100"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-                          <span className="text-zinc-600">Image</span>
-                        </div>
-                      )}
-                    </div>
-                    <h4 className="text-2xl font-bold mb-2 text-white group-hover:text-primary transition-colors">{member.name}</h4>
-                    <p className="font-label-md text-zinc-500 uppercase tracking-widest text-sm">{member.role}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
           </section>
         </div>
     </div>

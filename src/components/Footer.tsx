@@ -41,8 +41,6 @@ const navigationSections: FooterSection[] = [
     title: 'MY ACCOUNT',
     links: [
       { label: 'My Orders', href: '/orders', badge: 'Track', badgeType: 'track' },
-      { label: 'Order Tracking', href: '/orders' },
-      { label: 'Shopping Cart', href: '/cart' },
       { label: 'Sign In', href: '/login' },
       { label: 'Create Account', href: '/register' },
     ],
@@ -51,7 +49,6 @@ const navigationSections: FooterSection[] = [
     title: 'CUSTOMER CARE',
     links: [
       { label: 'Contact Us', href: '/contact' },
-      { label: 'Shipping Policy', href: '/shipping' },
       { label: 'Returns & Refunds', href: '/returns' },
       { label: 'Help & FAQs', href: '/contact' },
     ],
@@ -62,7 +59,6 @@ const navigationSections: FooterSection[] = [
       { label: 'About NOVARIX', href: '/about' },
       { label: 'Privacy Policy', href: '/privacy' },
       { label: 'Terms of Service', href: '/terms' },
-      { label: 'Merchant Portal', href: 'https://admin.novarixshop.tech', external: true },
     ],
   },
 ];
@@ -195,7 +191,7 @@ export default function Footer() {
         {/* Bottom Legal & Payment Icons Bar */}
         <div className="border-t border-white/[0.08] mt-16 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-zinc-500 text-center sm:text-left">
-            © 2025 NOVARIX Luxury Commerce. All rights reserved.
+            © 2025 NOVARIX. All rights reserved.
           </p>
           <div className="flex items-center gap-3.5 text-zinc-500">
             <span title="Cash on Delivery">

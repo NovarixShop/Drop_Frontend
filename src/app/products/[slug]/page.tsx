@@ -318,6 +318,12 @@ export default function ProductDetailPage() {
                   </button>
                 ))}
               </div>
+              {selectedSize === "Free Size" && (
+                <p className="text-[11px] text-on-surface-variant/80 mt-2.5 flex items-center gap-1.5">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary" />
+                  Free Size — universal one-size fit for all standard body types.
+                </p>
+              )}
             </div>
           )}
 
