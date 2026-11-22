@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { api, getErrorMessage } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { useIsClient } from "@/lib/useIsClient";
-import { Order, ORDER_STATUS_STYLES, needsPayment, shortOrderId } from "@/lib/orders";
+import { Order, ORDER_STATUS_STYLES, getOrderStatusDisplay, needsPayment, shortOrderId } from "@/lib/orders";
 import { useLenis } from "@studio-freight/react-lenis";
 import {
   openRazorpayCheckout,
@@ -164,7 +164,7 @@ export default function OrderDetailPage() {
     );
   }
 
-  const status = ORDER_STATUS_STYLES[order.orderStatus];
+  const status = getOrderStatusDisplay(order);
   const { totals, shippingAddress: addr } = order;
 
   return (
@@ -242,7 +242,9 @@ export default function OrderDetailPage() {
                   <li key={`${cp.status}-${idx}`} className="ml-6">
                     <span
                       className={`absolute -left-[7px] w-3.5 h-3.5 rounded-full ${
-                        idx === 0 ? "bg-primary ring-4 ring-primary/20 shadow-sm shadow-primary/50" : "bg-outline-variant"
+                        idx === 0
+                          ? "bg-primary ring-4 ring-primary/20 shadow-sm shadow-primary/50"
+                          : "bg-emerald-500/80 ring-2 ring-emerald-500/20"
                       }`}
                     />
                     <p className="font-bold text-on-surface">{cp.status}</p>

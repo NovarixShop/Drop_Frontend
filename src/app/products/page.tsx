@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import ProductImage from '@/components/products/ProductImage';
-import { useProductStore } from '@/store/productStore';
+import { useProductStore, Category } from '@/store/productStore';
 import { useCartStore } from '@/store/cartStore';
 import { useWishlistStore } from '@/store/wishlistStore';
 import { Heart, Filter, X, SearchX } from 'lucide-react';
@@ -50,8 +50,59 @@ function ProductsPageContent() {
     fetchProducts({ sort: key });
   };
 
-  const handleCategoryChange = (cat: string) => {
-    setFilter('category', filters.category === cat ? null : cat);
+  // Helper to find a category anywhere in the tree
+  const findCategory = (slug: string, nodes: Category[]): Category | null => {
+    for (const node of nodes) {
+      if (node.slug === slug) return node;
+      if (node.children && node.children.length > 0) {
+        const found = findCategory(slug, node.children);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  // Helper to find parent of a category
+  const findParentCategory = (slug: string, nodes: Category[]): Category | null => {
+    for (const parent of nodes) {
+      if (parent.children?.some((c) => c.slug === slug)) return parent;
+      if (parent.children && parent.children.length > 0) {
+        const nested = findParentCategory(slug, parent.children);
+        if (nested) return nested;
+      }
+    }
+    return null;
+  };
+
+  const currentSlug = filters.category;
+  const currentCategory = currentSlug ? findCategory(currentSlug, categories) : null;
+  const parentOfCurrent = currentSlug ? findParentCategory(currentSlug, categories) : null;
+
+  // Active top-level category:
+  const activeParentCategory = parentOfCurrent || (currentCategory && !currentCategory.parentCategory ? currentCategory : null);
+
+  // Active subcategory (if any):
+  const activeSubcategory = parentOfCurrent ? currentCategory : null;
+
+  // Flatten all subcategories across the catalog when no parent is selected
+  const allCatalogSubcategories = categories.flatMap((c) => c.children || []);
+
+  const handleTopLevelCategorySelect = (catSlug: string) => {
+    if (activeParentCategory?.slug === catSlug && !activeSubcategory) {
+      // Toggle off if already selected and no subcategory
+      setFilter('category', null);
+    } else {
+      setFilter('category', catSlug);
+    }
+  };
+
+  const handleSubcategorySelect = (subSlug: string) => {
+    if (filters.category === subSlug) {
+      // If clicking active subcategory again, fall back to its parent category
+      setFilter('category', activeParentCategory ? activeParentCategory.slug : null);
+    } else {
+      setFilter('category', subSlug);
+    }
   };
 
   return (
@@ -67,32 +118,86 @@ function ProductsPageContent() {
         </button>
       </div>
 
-      {/* SideNavBar (Filter Drawer) */}
+      {/* SideNavBar (Filter Drawer) - Categories on Left */}
       <aside className={`${mobileFilterOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 top-nav h-below-nav fixed left-0 z-40 w-80 lg:sticky bg-surface border-r border-outline-variant/30 shadow-sm transition-transform duration-500 overflow-y-auto`}>
         <div className="flex flex-col h-full py-10 px-6">
-          <div className="mb-10">
+          <div className="mb-8">
             <h2 className="font-headline-lg text-2xl text-on-surface font-bold">Filters</h2>
             <p className="text-on-surface-variant text-body-md mt-1">Refine your selection</p>
           </div>
           
-          <div className="space-y-10 flex-grow">
-            {/* Categories */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-on-surface font-bold border-l-4 border-primary pl-4 text-label-md uppercase tracking-wider">
-                <span>Category</span>
+          <div className="space-y-8 flex-grow">
+            {/* Categories Section on the Left */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-l-4 border-primary pl-4 py-0.5">
+                <span className="text-on-surface font-bold text-label-md uppercase tracking-wider">
+                  Category
+                </span>
+                {activeParentCategory && (
+                  <button
+                    onClick={() => setFilter('category', null)}
+                    className="text-[11px] text-primary hover:underline font-semibold"
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
-              <div className="pl-8 space-y-4 py-2">
-                {categories.map((cat) => (
-                  <label key={cat._id} className="flex items-center gap-3 cursor-pointer hover:text-primary transition-colors group">
+              <div className="pl-4 space-y-1.5 py-1">
+                {/* All Categories Option */}
+                <div 
+                  onClick={() => setFilter('category', null)}
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-all ${
+                    !activeParentCategory
+                      ? 'bg-primary/15 text-primary font-bold'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
                     <input 
-                      type="checkbox" 
-                      checked={filters.category === cat.slug}
-                      onChange={() => handleCategoryChange(cat.slug)}
-                      className="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary bg-transparent cursor-pointer" 
+                      type="radio" 
+                      name="category-left"
+                      checked={!activeParentCategory}
+                      onChange={() => setFilter('category', null)}
+                      className="w-4 h-4 text-primary focus:ring-primary bg-transparent cursor-pointer" 
                     />
-                    <span className="text-label-md capitalize group-hover:translate-x-1 transition-transform">{cat.name}</span>
-                  </label>
-                ))}
+                    <span className="text-label-md">All Categories</span>
+                  </div>
+                </div>
+
+                {/* Top-Level Categories */}
+                {categories.map((cat) => {
+                  const isSelected = activeParentCategory?.slug === cat.slug;
+                  const subCount = cat.children?.length || 0;
+                  return (
+                    <div 
+                      key={cat._id} 
+                      onClick={() => handleTopLevelCategorySelect(cat.slug)}
+                      className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-all group ${
+                        isSelected
+                          ? 'bg-primary/15 text-primary font-bold'
+                          : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <input 
+                          type="radio" 
+                          name="category-left"
+                          checked={isSelected}
+                          onChange={() => handleTopLevelCategorySelect(cat.slug)}
+                          className="w-4 h-4 text-primary focus:ring-primary bg-transparent cursor-pointer" 
+                        />
+                        <span className="text-label-md capitalize group-hover:translate-x-0.5 transition-transform">
+                          {cat.name}
+                        </span>
+                      </div>
+                      {subCount > 0 && (
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-surface-container-high/70 text-on-surface-variant font-medium">
+                          {subCount}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -139,14 +244,22 @@ function ProductsPageContent() {
         <motion.header 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6"
+          className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6"
         >
           <div>
             <h1 className="font-headline-xl text-on-surface mb-3 capitalize">
-              {filters.category ? `${filters.category} Collection` : "Full Collection"}
+              {activeSubcategory
+                ? `${activeSubcategory.name}`
+                : activeParentCategory
+                ? `${activeParentCategory.name} Collection`
+                : "Full Collection"}
             </h1>
             <p className="text-on-surface-variant max-w-2xl font-body-md text-lg">
-              A curated fusion of cutting-edge technology and avant-garde fashion essentials. Every piece is selected for the discerning minimalist.
+              {activeSubcategory
+                ? `Explore our collection of ${activeSubcategory.name} in ${activeParentCategory?.name || 'our catalog'}.`
+                : activeParentCategory
+                ? `Explore all products in ${activeParentCategory.name}. Browse sub-categories above to narrow down your view.`
+                : 'A curated fusion of cutting-edge technology and avant-garde fashion essentials. Every piece is selected for the discerning minimalist.'}
             </p>
           </div>
           <div className="flex items-center gap-4 bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant/30">
@@ -166,34 +279,107 @@ function ProductsPageContent() {
           </div>
         </motion.header>
 
-        {/* Horizontal Category Pills Bar (Browse Individually) */}
-        <div className="mb-10 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          <button
-            onClick={() => setFilter('category', null)}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
-              !filters.category
-                ? 'bg-primary text-white shadow-md shadow-primary/25 scale-105'
-                : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/30'
-            }`}
-          >
-            All Products
-          </button>
-          {categories.map((cat) => {
-            const isSelected = filters.category === cat.slug;
-            return (
+        {/* Top Horizontal Sub-categories Section */}
+        <div className="mb-10 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant flex items-center gap-1.5">
+                <span>Sub-categories</span>
+              </span>
+              {activeParentCategory ? (
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold border border-primary/20">
+                  in {activeParentCategory.name}
+                </span>
+              ) : (
+                <span className="text-xs text-on-surface-variant/70 font-medium">
+                  (Select a category on the left or browse sub-categories below)
+                </span>
+              )}
+            </div>
+
+            {activeSubcategory && (
               <button
-                key={cat._id}
-                onClick={() => handleCategoryChange(cat.slug)}
-                className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap capitalize ${
-                  isSelected
-                    ? 'bg-primary text-white shadow-md shadow-primary/25 scale-105'
-                    : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/30'
-                }`}
+                onClick={() => setFilter('category', activeParentCategory ? activeParentCategory.slug : null)}
+                className="text-xs text-primary hover:underline font-medium"
               >
-                {cat.name}
+                View all in {activeParentCategory?.name || 'all'}
               </button>
-            );
-          })}
+            )}
+          </div>
+
+          {/* Horizontal Pills for Sub-categories */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            {activeParentCategory ? (
+              <>
+                {/* "All in <Category>" pill */}
+                <button
+                  onClick={() => setFilter('category', activeParentCategory.slug)}
+                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap capitalize ${
+                    !activeSubcategory
+                      ? 'bg-primary text-white shadow-md shadow-primary/25 scale-105'
+                      : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/30'
+                  }`}
+                >
+                  All {activeParentCategory.name}
+                </button>
+
+                {/* Subcategories belonging to active parent category */}
+                {activeParentCategory.children && activeParentCategory.children.length > 0 ? (
+                  activeParentCategory.children.map((sub) => {
+                    const isSelected = activeSubcategory?.slug === sub.slug;
+                    return (
+                      <button
+                        key={sub._id}
+                        onClick={() => handleSubcategorySelect(sub.slug)}
+                        className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap capitalize ${
+                          isSelected
+                            ? 'bg-primary text-white shadow-md shadow-primary/25 scale-105'
+                            : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/30'
+                        }`}
+                      >
+                        {sub.name}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <span className="text-xs text-on-surface-variant/70 italic py-1 px-3 bg-surface-container-low rounded-full border border-outline-variant/20">
+                    No sub-categories created for {activeParentCategory.name} yet
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                {/* When no category is selected on the left: All Products + all catalog subcategories */}
+                <button
+                  onClick={() => setFilter('category', null)}
+                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${
+                    !filters.category
+                      ? 'bg-primary text-white shadow-md shadow-primary/25 scale-105'
+                      : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/30'
+                  }`}
+                >
+                  All Products
+                </button>
+
+                {allCatalogSubcategories.map((sub) => {
+                  const isSelected = filters.category === sub.slug;
+                  return (
+                    <button
+                      key={sub._id}
+                      onClick={() => handleSubcategorySelect(sub.slug)}
+                      className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap capitalize ${
+                        isSelected
+                          ? 'bg-primary text-white shadow-md shadow-primary/25 scale-105'
+                          : 'bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/30'
+                      }`}
+                    >
+                      {sub.name}
+                    </button>
+                  );
+                })}
+              </>
+            )}
+          </div>
         </div>
 
         {/* Product Grid */}
