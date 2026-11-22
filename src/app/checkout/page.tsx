@@ -126,13 +126,6 @@ export default function CheckoutPage() {
   const [userName, setUserName] = useState(user?.name || "");
   const [userPhone, setUserPhone] = useState(user?.phone || "");
 
-  useEffect(() => {
-    if (user) {
-      if (!userName && user.name) setUserName(user.name);
-      if (!userPhone && user.phone) setUserPhone(user.phone);
-    }
-  }, [user, userName, userPhone]);
-
   const [couponCode, setCouponCode] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
 

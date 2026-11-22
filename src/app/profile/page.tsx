@@ -22,12 +22,22 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+interface ProfileAddress {
+  _id?: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  isDefault?: boolean;
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isAuthenticated, updateUser, fetchProfile } = useAuthStore();
 
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [name, setName] = useState(user?.name || '');
+  const [phone, setPhone] = useState(user?.phone || '');
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
@@ -49,7 +59,7 @@ export default function ProfilePage() {
         if (userData) {
           setName(userData.name || '');
           setPhone(userData.phone || '');
-          const defaultAddr = userData.addresses?.find((a: any) => a.isDefault) || userData.addresses?.[0];
+          const defaultAddr = userData.addresses?.find((a: ProfileAddress) => a.isDefault) || userData.addresses?.[0];
           if (defaultAddr) {
             setStreet(defaultAddr.street || '');
             setCity(defaultAddr.city || '');
@@ -68,14 +78,6 @@ export default function ProfilePage() {
 
     init();
   }, [isAuthenticated, router, updateUser]);
-
-  // Sync state if store user changes
-  useEffect(() => {
-    if (user && !initialLoading) {
-      if (!name && user.name) setName(user.name);
-      if (!phone && user.phone) setPhone(user.phone);
-    }
-  }, [user, initialLoading, name, phone]);
 
   const isProfileComplete = Boolean(
     name.trim() &&

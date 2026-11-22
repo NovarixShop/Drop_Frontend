@@ -8,7 +8,7 @@ import { ChevronRight, Loader2, Package } from "lucide-react";
 import { api, getErrorMessage } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { useIsClient } from "@/lib/useIsClient";
-import { Order, ORDER_STATUS_STYLES, getOrderStatusDisplay, needsPayment, shortOrderId } from "@/lib/orders";
+import { Order, getOrderStatusDisplay, needsPayment, shortOrderId } from "@/lib/orders";
 
 const PAGE_SIZE = 10;
 

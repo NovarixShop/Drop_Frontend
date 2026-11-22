@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { api, getErrorMessage } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { useIsClient } from "@/lib/useIsClient";
-import { Order, ORDER_STATUS_STYLES, getOrderStatusDisplay, needsPayment, shortOrderId } from "@/lib/orders";
+import { Order, getOrderStatusDisplay, needsPayment, shortOrderId } from "@/lib/orders";
 import { useLenis } from "@studio-freight/react-lenis";
 import {
   openRazorpayCheckout,
