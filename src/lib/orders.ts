@@ -23,10 +23,32 @@ export interface Order {
 
 export const ORDER_STATUS_STYLES: Record<OrderStatus, { label: string; className: string }> = {
   pending: { label: "Pending", className: "bg-amber-500/15 text-amber-600 dark:text-amber-400" },
-  processing: { label: "Processing", className: "bg-blue-500/15 text-blue-600 dark:text-blue-400" },
+  processing: { label: "Payment Done", className: "bg-[#00C853]/15 text-[#00C853]" },
   shipped: { label: "Shipped", className: "bg-primary/15 text-primary" },
   delivered: { label: "Delivered", className: "bg-[#00C853]/15 text-[#00C853]" },
   cancelled: { label: "Cancelled", className: "bg-red-500/15 text-red-500" },
+};
+
+export const getOrderStatusDisplay = (order: Order): { label: string; className: string } => {
+  if (order.orderStatus === "cancelled") {
+    return { label: "Cancelled", className: "bg-red-500/15 text-red-500" };
+  }
+  if (order.orderStatus === "delivered") {
+    return { label: "Delivered", className: "bg-[#00C853]/15 text-[#00C853]" };
+  }
+  if (order.orderStatus === "shipped") {
+    return { label: "Shipped", className: "bg-primary/15 text-primary" };
+  }
+  if (order.paymentStatus === "paid" || order.orderStatus === "processing") {
+    if (order.paymentMethod === "cod" && order.paymentStatus !== "paid") {
+      return { label: "Order Confirmed", className: "bg-blue-500/15 text-blue-400" };
+    }
+    return { label: "Payment Done", className: "bg-[#00C853]/15 text-[#00C853]" };
+  }
+  if (order.orderStatus === "pending") {
+    return { label: "Pending", className: "bg-amber-500/15 text-amber-600 dark:text-amber-400" };
+  }
+  return { label: "Payment Done", className: "bg-[#00C853]/15 text-[#00C853]" };
 };
 
 export const shortOrderId = (id: string) => id.slice(-8).toUpperCase();

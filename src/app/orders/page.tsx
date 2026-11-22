@@ -8,7 +8,7 @@ import { ChevronRight, Loader2, Package } from "lucide-react";
 import { api, getErrorMessage } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { useIsClient } from "@/lib/useIsClient";
-import { Order, ORDER_STATUS_STYLES, needsPayment, shortOrderId } from "@/lib/orders";
+import { Order, ORDER_STATUS_STYLES, getOrderStatusDisplay, needsPayment, shortOrderId } from "@/lib/orders";
 
 const PAGE_SIZE = 10;
 
@@ -79,7 +79,7 @@ export default function OrdersPage() {
         <>
           <ul className="space-y-4">
             {orders.map((order, idx) => {
-              const status = ORDER_STATUS_STYLES[order.orderStatus];
+              const status = getOrderStatusDisplay(order);
               const itemCount = order.items.reduce((sum, i) => sum + i.quantity, 0);
               return (
                 <motion.li
