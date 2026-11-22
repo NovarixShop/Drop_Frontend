@@ -2,13 +2,25 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { api } from '../lib/api';
 
+export interface UserAddress {
+  _id?: string;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  isDefault?: boolean;
+}
+
 export interface User {
   id?: string;
   _id?: string;
   name: string;
   email: string;
+  phone?: string;
   role: string;
   isVerified: boolean;
+  addresses?: UserAddress[];
 }
 
 interface AuthState {
@@ -19,6 +31,8 @@ interface AuthState {
   error: string | null;
 
   setAccessToken: (token: string) => void;
+  updateUser: (user: Partial<User>) => void;
+  fetchProfile: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -36,6 +50,29 @@ export const useAuthStore = create<AuthState>()(
 
       setAccessToken: (token) => {
         set({ accessToken: token, isAuthenticated: !!token });
+      },
+
+      updateUser: (userData) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, ...userData } : (userData as User),
+        }));
+      },
+
+      fetchProfile: async () => {
+        try {
+          const res = await api.get('/users/profile');
+          const user = res.data.data?.user;
+          if (user) {
+            set((state) => ({
+              user: {
+                ...state.user,
+                ...user,
+              },
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to fetch user profile:', err);
+        }
       },
 
       clearError: () => set({ error: null }),

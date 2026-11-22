@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import ProductImage from "@/components/products/ProductImage";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { CheckCircle2, CreditCard, Loader2, MapPin, Truck, Tag, X, Package } from "lucide-react";
+import { CheckCircle2, CreditCard, Loader2, MapPin, Truck, Tag, X, Package, User, Phone, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { api, getErrorMessage } from "@/lib/api";
@@ -123,6 +123,16 @@ export default function CheckoutPage() {
   const [newAddress, setNewAddress] = useState<Address>(emptyAddress);
   const [saveAddress, setSaveAddress] = useState(true);
 
+  const [userName, setUserName] = useState(user?.name || "");
+  const [userPhone, setUserPhone] = useState(user?.phone || "");
+
+  useEffect(() => {
+    if (user) {
+      if (!userName && user.name) setUserName(user.name);
+      if (!userPhone && user.phone) setUserPhone(user.phone);
+    }
+  }, [user, userName, userPhone]);
+
   const [couponCode, setCouponCode] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
 
@@ -159,9 +169,10 @@ export default function CheckoutPage() {
 
     const load = async () => {
       try {
-        const [{ cart: serverCart, issues }, addressRes] = await Promise.all([
+        const [{ cart: serverCart, issues }, addressRes, profileRes] = await Promise.all([
           syncCartToServer(localItems),
           api.get("/users/addresses").catch(() => null),
+          api.get("/users/profile").catch(() => null),
         ]);
 
         setCart(serverCart);
@@ -179,6 +190,12 @@ export default function CheckoutPage() {
         });
 
         fetchRewards().catch(() => {});
+
+        if (profileRes?.data?.data?.user) {
+          const u = profileRes.data.data.user;
+          if (u.name) setUserName(u.name);
+          if (u.phone) setUserPhone(u.phone);
+        }
 
         const saved: Address[] = addressRes?.data?.data?.addresses ?? [];
         setAddresses(saved);
@@ -275,20 +292,49 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!userName.trim()) {
+      const msg = "Please provide your full name before placing your order.";
+      toast.error(msg);
+      setError(msg);
+      return;
+    }
+
+    if (!userPhone.trim() || userPhone.trim().length < 7) {
+      const msg = "Please enter a valid contact phone number required for order delivery and OTP verification.";
+      toast.error(msg);
+      setError(msg);
+      return;
+    }
+
+    const shippingAddress =
+      selectedAddressId === "new"
+        ? newAddress
+        : addresses.find((a) => a._id === selectedAddressId) ?? newAddress;
+    const { street, city, state, postalCode, country } = shippingAddress;
+
+    if (!street.trim() || !city.trim() || !state.trim() || !postalCode.trim()) {
+      const msg = "Please provide a complete shipping address (street, city, state, and postal code).";
+      toast.error(msg);
+      setError(msg);
+      return;
+    }
+
     setPlacing(true);
 
     try {
+      // Concurrently update user profile in background
+      api.put("/users/profile", {
+        name: userName.trim(),
+        phone: userPhone.trim(),
+        address: { street, city, state, postalCode, country },
+      }).catch(() => {});
+
       // Retrying payment for an order that already exists
       if (pendingOrder) {
         if (await payWithRazorpay(pendingOrder)) completeOrder(pendingOrder);
         return;
       }
-
-      const shippingAddress =
-        selectedAddressId === "new"
-          ? newAddress
-          : addresses.find((a) => a._id === selectedAddressId) ?? newAddress;
-      const { street, city, state, postalCode, country } = shippingAddress;
 
       if (selectedAddressId === "new" && saveAddress) {
         await api
@@ -298,7 +344,14 @@ export default function CheckoutPage() {
 
       const res = await api.post("/orders/checkout", {
         paymentMethod: effectivePaymentMethod,
-        shippingAddress: { street, city, state, postalCode, country },
+        shippingAddress: {
+          street,
+          city,
+          state,
+          postalCode,
+          country,
+          phone: userPhone.trim(),
+        },
       });
       const order: PlacedOrder = res.data.data.order;
 
@@ -413,10 +466,75 @@ export default function CheckoutPage() {
               payment. Enter your card details again to complete it.
             </div>
           ) : (
-            <section className="bg-surface-container-low rounded-2xl p-6">
-              <h2 className="flex items-center gap-2 font-headline-md text-headline-md mb-6">
-                <MapPin size={20} className="text-primary" /> Shipping Address
-              </h2>
+            <>
+              {/* Contact & Delivery Credentials Card */}
+              <section className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/40">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="flex items-center gap-2 font-headline-md text-headline-md">
+                    <User size={20} className="text-primary" /> Contact Credentials
+                  </h2>
+                  {(!userName.trim() || !userPhone.trim()) && (
+                    <span className="flex items-center gap-1.5 text-xs text-amber-500 font-semibold bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/30">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      Required for Delivery
+                    </span>
+                  )}
+                </div>
+
+                <p className="text-xs text-on-surface-variant mb-4">
+                  These verified credentials will be attached to your order and used by the courier partner for delivery updates and dispatch.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold uppercase text-on-surface-variant mb-1.5">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      placeholder="Your full name"
+                      className={inputClass}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold uppercase text-on-surface-variant mb-1.5">
+                      Phone Number * (Required)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        required
+                        value={userPhone}
+                        onChange={(e) => setUserPhone(e.target.value)}
+                        placeholder="e.g. +91 9876543210"
+                        className={`${inputClass} pl-10`}
+                      />
+                      <Phone className="w-4 h-4 text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold uppercase text-on-surface-variant mb-1">
+                      Account Email
+                    </label>
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-surface border border-outline-variant/40 text-xs text-on-surface-variant">
+                      <span>Signed in as: <strong className="text-on-surface">{user?.email}</strong></span>
+                      <span className="text-[11px] font-semibold text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                        Verified Login
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="bg-surface-container-low rounded-2xl p-6">
+                <h2 className="flex items-center gap-2 font-headline-md text-headline-md mb-6">
+                  <MapPin size={20} className="text-primary" /> Shipping Address
+                </h2>
 
               {addresses.length > 0 && (
                 <div className="space-y-3 mb-6">
@@ -510,6 +628,7 @@ export default function CheckoutPage() {
                 </div>
               )}
             </section>
+            </>
           )}
 
           <section className="bg-surface-container-low rounded-2xl p-6">
