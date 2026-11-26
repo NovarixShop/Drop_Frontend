@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { ArrowRight, CheckCircle2, Hexagon, Fingerprint } from 'lucide-react';
+import { CheckCircle2, Hexagon, Fingerprint } from 'lucide-react';
 
 export default function AboutPage() {
   return (
@@ -27,7 +27,7 @@ export default function AboutPage() {
                   Curating Modern Luxury, Made Effortless.
                 </h1>
                 <p className="font-body-lg text-lg md:text-2xl text-zinc-400 mb-10 md:mb-12 leading-relaxed max-w-2xl font-light">
-                  NOVARIX was created with a simple belief: shopping for exceptional pieces shouldn't mean sifting through endless clutter. We curate a focused collection of fashion, accessories, and lifestyle essentials defined by quality, taste, and lasting value.
+                  NOVARIX was created with a simple belief: shopping for exceptional pieces shouldn&apos;t mean sifting through endless clutter. We curate a focused collection of fashion, accessories, and lifestyle essentials defined by quality, taste, and lasting value.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                   {/* <button className="bg-primary text-primary-foreground px-8 py-4 md:px-10 md:py-5 rounded-2xl font-label-md hover:scale-105 transition-all duration-300 shadow-[0_0_40px_rgba(var(--color-primary-rgb),0.4)] flex items-center justify-center gap-3 group">
