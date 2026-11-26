@@ -50,9 +50,9 @@ export default function RewardsPage() {
           className="mb-12 md:mb-20 text-center max-w-2xl mx-auto"
         >
           <span className="font-label-md text-primary uppercase tracking-[0.2em] mb-4 block">Exclusive Benefits</span>
-          <h1 className="font-headline-xl text-on-surface mb-6 text-4xl md:text-5xl">LUXE Rewards</h1>
+          <h1 className="font-headline-xl text-on-surface mb-6 text-4xl md:text-5xl">NOVARIX Privileges</h1>
           <p className="font-body-md text-on-surface-variant text-base md:text-lg leading-relaxed">
-            Engage with our ecosystem to unlock exclusive discounts, early access, and complimentary gifts. Your loyalty, rewarded with precision.
+            Earn points on every purchase and unlock private sale access, birthday gifts, and priority member privileges.
           </p>
         </motion.header>
 

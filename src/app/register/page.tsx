@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
   
@@ -40,6 +41,10 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
+    if (!acceptedTerms) {
+      toast.error('Please accept the Terms and Conditions to create an account.');
+      return;
+    }
     try {
       await register(name, email, password);
       setIsSuccess(true);
@@ -168,6 +173,25 @@ export default function RegisterPage() {
               placeholder="••••••••"
             />
           </div>
+
+          <label className="flex items-start gap-3 text-sm text-gray-300 cursor-pointer select-none pt-1">
+            <input
+              type="checkbox"
+              required
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="mt-1 w-4 h-4 rounded border-white/20 bg-black/50 accent-white cursor-pointer shrink-0"
+            />
+            <span>
+              I accept the{' '}
+              <Link
+                href="/terms"
+                className="text-white underline hover:text-gray-200 font-medium"
+              >
+                Terms and Conditions
+              </Link>
+            </span>
+          </label>
 
           <button
             type="submit"

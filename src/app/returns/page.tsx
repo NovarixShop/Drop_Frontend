@@ -10,7 +10,7 @@ export default function ReturnsPage() {
           Returns & Refund Policy
         </h1>
         <p className="text-sm text-on-surface-variant">
-          Simple, transparent 7-day return guarantee with door-step reverse pickup.
+          Simple, transparent 7day return guarantee with doorstep reverse pickup.
         </p>
       </div>
 
@@ -18,7 +18,7 @@ export default function ReturnsPage() {
         <section className="space-y-3">
           <h2 className="text-lg md:text-xl font-bold text-on-surface flex items-center gap-2">
             <RotateCcw className="w-5 h-5 text-primary shrink-0" />
-            1. 7-Day Hassle-Free Returns
+            1. 7Day Hassle-Free Returns
           </h2>
           <p>
             We stand behind every product we sell. If you receive a product that is defective, damaged, or not as described, you may request a free replacement or full refund within <strong>7 days</strong> from the delivery date.

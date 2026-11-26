@@ -281,31 +281,16 @@ function ProductsPageContent() {
 
         {/* Top Horizontal Sub-categories Section */}
         <div className="mb-10 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant flex items-center gap-1.5">
-                <span>Sub-categories</span>
-              </span>
-              {activeParentCategory ? (
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/15 text-primary font-semibold border border-primary/20">
-                  in {activeParentCategory.name}
-                </span>
-              ) : (
-                <span className="text-xs text-on-surface-variant/70 font-medium">
-                  (Select a category on the left or browse sub-categories below)
-                </span>
-              )}
-            </div>
-
-            {activeSubcategory && (
+          {activeSubcategory && (
+            <div className="flex items-center justify-end">
               <button
                 onClick={() => setFilter('category', activeParentCategory ? activeParentCategory.slug : null)}
                 className="text-xs text-primary hover:underline font-medium"
               >
                 View all in {activeParentCategory?.name || 'all'}
               </button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Horizontal Pills for Sub-categories */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">

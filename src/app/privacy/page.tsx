@@ -10,7 +10,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="text-sm text-on-surface-variant">
-          Last updated: November 2026 · Effective Date: January 1, 2026
+          Last updated: November 2026
         </p>
       </div>
 
@@ -77,10 +77,10 @@ export default function PrivacyPage() {
           <p>
             If you have questions about your data, wish to request data deletion, or want to update your preferences, please contact us at:
           </p>
-          <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/30 text-sm">
+          {/* <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/30 text-sm">
             <p><strong>Email:</strong> privacy@novarixshop.tech / support@novarixshop.tech</p>
             <p><strong>Address:</strong> NOVARIX Technologies, Indiranagar, Bengaluru, Karnataka 560038, India</p>
-          </div>
+          </div> */}
         </section>
       </div>
     </div>

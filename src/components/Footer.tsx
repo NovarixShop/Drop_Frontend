@@ -50,7 +50,7 @@ const navigationSections: FooterSection[] = [
     links: [
       { label: 'Contact Us', href: '/contact' },
       { label: 'Returns & Refunds', href: '/returns' },
-      { label: 'Help & FAQs', href: '/contact' },
+      { label: 'Help', href: '/contact' },
     ],
   },
   {
@@ -58,7 +58,7 @@ const navigationSections: FooterSection[] = [
     links: [
       { label: 'About NOVARIX', href: '/about' },
       { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms of Service', href: '/terms' },
+      { label: 'Terms and Conditions', href: '/terms' },
     ],
   },
 ];
@@ -87,15 +87,13 @@ export default function Footer() {
           <div className="lg:col-span-5 w-full max-w-[440px]">
             {/* Logo Emblem */}
             <Link href="/" className="inline-block group" aria-label="NOVARIX Home">
-              <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden border border-white/10 bg-black/50 shadow-md">
-                <Image
-                  src="/logo-dark-full.jpg"
-                  alt="NOVARIX"
-                  fill
-                  sizes="64px"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
+              <Image
+                src="/logo-dark.png"
+                alt="NOVARIX"
+                width={180}
+                height={28}
+                className="h-7 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
             </Link>
 
             {/* Brand Mission Statement */}

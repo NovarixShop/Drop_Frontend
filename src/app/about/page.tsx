@@ -24,19 +24,19 @@ export default function AboutPage() {
                 className="lg:col-span-7 relative z-20"
               >
                 <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6 md:mb-8 break-words bg-clip-text text-transparent bg-gradient-to-br from-white via-zinc-200 to-zinc-600">
-                  Defining the architecture of modern luxury.
+                  Curating Modern Luxury, Made Effortless.
                 </h1>
                 <p className="font-body-lg text-lg md:text-2xl text-zinc-400 mb-10 md:mb-12 leading-relaxed max-w-2xl font-light">
-                  LUXE was born from a singular obsession: to engineer artifacts that transcend the disposable nature of modern consumerism. We merge uncompromising technological rigor with the soul of haute couture.
+                  NOVARIX was created with a simple belief: shopping for exceptional pieces shouldn't mean sifting through endless clutter. We curate a focused collection of fashion, accessories, and lifestyle essentials defined by quality, taste, and lasting value.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                  <button className="bg-primary text-primary-foreground px-8 py-4 md:px-10 md:py-5 rounded-2xl font-label-md hover:scale-105 transition-all duration-300 shadow-[0_0_40px_rgba(var(--color-primary-rgb),0.4)] flex items-center justify-center gap-3 group">
+                  {/* <button className="bg-primary text-primary-foreground px-8 py-4 md:px-10 md:py-5 rounded-2xl font-label-md hover:scale-105 transition-all duration-300 shadow-[0_0_40px_rgba(var(--color-primary-rgb),0.4)] flex items-center justify-center gap-3 group">
                     View Lookbook
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </button>
                   <button className="bg-white/5 border border-white/10 backdrop-blur-xl text-white px-8 py-4 md:px-10 md:py-5 rounded-2xl font-label-md hover:bg-white/10 transition-all duration-300">
                     Our Process
-                  </button>
+                  </button> */}
                 </div>
               </motion.div>
               
@@ -68,8 +68,8 @@ export default function AboutPage() {
                 viewport={{ once: true, margin: "-100px" }}
                 className="mb-10 md:mb-20 text-center md:text-left"
               >
-                <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 tracking-tight text-white break-words">An uncompromising synthesis.</h2>
-                <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto md:mx-0 leading-relaxed">We do not accept the binary choice between performance and aesthetics. Every artifact we produce is a testament to perfect equilibrium.</p>
+                <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 md:mb-6 tracking-tight text-white break-words">The NOVARIX Standard</h2>
+                {/* <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto md:mx-0 leading-relaxed">We do not accept the binary choice between performance and aesthetics. Every artifact we produce is a testament to perfect equilibrium.</p> */}
               </motion.div>
               
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 auto-rows-[340px] md:auto-rows-[400px]">
@@ -87,8 +87,8 @@ export default function AboutPage() {
                     <div className="mb-6 p-4 bg-white/10 backdrop-blur-md rounded-2xl inline-block border border-white/10">
                       <Hexagon className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="text-2xl sm:text-4xl font-bold mb-3 md:mb-4 text-white">Advanced Tech</h3>
-                    <p className="text-base sm:text-xl text-zinc-300 max-w-[512px] leading-relaxed font-light">Engineered with absolute precision. Our technological hardware is designed to deliver unprecedented, frictionless performance.</p>
+                    <h3 className="text-2xl sm:text-4xl font-bold mb-3 md:mb-4 text-white">Thoughtful Curation</h3>
+                    <p className="text-base sm:text-xl text-zinc-300 max-w-[512px] leading-relaxed font-light">Every item is vetted for design, finish, and wearability so you only see pieces worth owning.</p>
                   </div>
                 </motion.div>
                 
@@ -105,8 +105,8 @@ export default function AboutPage() {
                   </div>
                   <div className="relative z-10">
                     <CheckCircle2 className="text-primary w-10 h-10 mb-8" />
-                    <h3 className="text-2xl sm:text-3xl font-bold mb-3 md:mb-4 text-white">Material Purity</h3>
-                    <p className="text-base sm:text-lg text-zinc-400 leading-relaxed">Sourced globally, refined meticulously. Only the highest-grade materials earn the LUXE hallmark.</p>
+                    <h3 className="text-2xl sm:text-3xl font-bold mb-3 md:mb-4 text-white">Uncompromising Quality</h3>
+                    <p className="text-base sm:text-lg text-zinc-400 leading-relaxed">From supple leathers and heavyweight cottons to refined finishes, we prioritize materials that look and feel substantial.</p>
                   </div>
                 </motion.div>
                 
@@ -121,8 +121,8 @@ export default function AboutPage() {
                   <div className="absolute inset-0 bg-cover bg-center transition-transform duration-[2s] group-hover:scale-110" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC30Aeaz4C1rX3wEfM_7rj84f4iQ1rd5YGUyZCik2XezFQL_4htsArSqQh914WIHyMunHvgGcmccjByu-a6ZL0TuYoo9KkAZL6YsqCsXx18joTy3A7_X8Y0ce-1zuIE2NFISzX7JhTrfwKTmhbd6hPsi_oi8Capoqw8J2Fv1UBKm7fONc9AM1jX-t6GFEnx66iNuzPYd81pNRMUNN0WDmmH3xysIvEjm4TKOub6vEjfICbkezZFYDJ6')" }}></div>
                   <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/40 to-transparent opacity-90"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
-                    <h3 className="text-2xl sm:text-3xl font-bold mb-3 md:mb-4 text-white">Avant-Garde</h3>
-                    <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-light">Silhouettes defined by architectural structure, comfort, and an unapologetic, refined palette.</p>
+                    <h3 className="text-2xl sm:text-3xl font-bold mb-3 md:mb-4 text-white">Timeless Aesthetic</h3>
+                    <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-light">We favor clean lines, versatile palettes, and enduring style over short lived micro trends.</p>
                   </div>
                 </motion.div>
                 
@@ -138,8 +138,8 @@ export default function AboutPage() {
                   <div className="absolute inset-0 bg-gradient-to-r from-[#09090b] to-transparent opacity-90"></div>
                   <div className="absolute inset-0 flex items-center p-6 sm:p-12">
                     <div className="max-w-[576px]">
-                      <h3 className="text-2xl sm:text-4xl font-bold mb-3 md:mb-6 text-white">Curated Environments</h3>
-                      <p className="text-base sm:text-xl text-zinc-300 leading-relaxed font-light">We design digital and physical ecosystems that respect your attention, offering profound breathing room in an overcrowded world.</p>
+                      <h3 className="text-2xl sm:text-4xl font-bold mb-3 md:mb-6 text-white">Seamless Experience</h3>
+                      <p className="text-base sm:text-xl text-zinc-300 leading-relaxed font-light">From effortless browsing to reliable doorstep delivery, every step of your order is handled with care.</p>
                     </div>
                   </div>
                 </motion.div>
@@ -157,7 +157,7 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="text-3xl sm:text-5xl md:text-7xl font-bold mb-10 md:mb-16 leading-tight break-words tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-zinc-500"
             >
-              Sustainability is not a feature. <br/> It is our foundation.
+              Buy Better, Keep Longer.
             </motion.h2>
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
@@ -166,11 +166,11 @@ export default function AboutPage() {
               transition={{ delay: 0.1 }}
               className="space-y-8 md:space-y-12 text-zinc-300 font-light text-left leading-relaxed text-lg sm:text-2xl md:text-3xl max-w-4xl mx-auto"
             >
-              <p>
-                The modern landscape is saturated with noise and planned obsolescence. LUXE serves as the antidote. We operate on a philosophy of radical subtraction—stripping away the superfluous until only absolute perfection remains. 
+              <p className="text-center">
+                Fast fashion and disposable goods fade after a single season. At NOVARIX, we focus on pieces with staying power versatile designs and dependable craftsmanship made to stay in your rotation year after year.
               </p>
-              <p className="text-zinc-500">
-                From the molecular structure of our aerospace-grade alloys to the ethically sourced organic textiles woven into our garments, our material science is as rigorous as our design ethos. We do not chase seasonal trends; we architect enduring icons designed to outlive their creators.
+              <p className="text-center zinc-500">
+                NOVARIX is your curated online destination for contemporary fashion, refined accessories, and elevated lifestyle essentials. Quality first, always in style.
               </p>
             </motion.div>
           </section>
