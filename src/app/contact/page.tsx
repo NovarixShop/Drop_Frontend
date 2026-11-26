@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, MessageSquare } from 'lucide-react';
+import { Mail, Phone, Send, CheckCircle2, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ContactPage() {
@@ -65,32 +65,6 @@ export default function ContactPage() {
               <a href="tel:+918041234567" className="text-sm font-medium text-primary hover:underline">
                 +91 (80) 4123-4567
               </a>
-            </div>
-          </div>
-
-          <div className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <MapPin className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-on-surface text-base">Corporate Office</h3>
-              <p className="text-sm text-on-surface-variant mt-1">
-                NOVARIX Technologies Pvt. Ltd.<br />
-                Indiranagar, 100 Feet Road<br />
-                Bengaluru, Karnataka 560038, India
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <Clock className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-on-surface text-base">Order Processing Hours</h3>
-              <p className="text-sm text-on-surface-variant mt-1">
-                Orders placed before 2:00 PM IST dispatch the same business day across India.
-              </p>
             </div>
           </div>
         </div>

@@ -48,7 +48,7 @@ export default function Home() {
             ></motion.div>
             <div className="absolute bottom-6 left-6 right-6 z-20 md:bottom-10 md:left-10 md:right-10">
               <span className="bg-primary px-2.5 py-1 rounded-full text-white font-label-md text-[10px] tracking-widest uppercase mb-2 inline-block">Fashion</span>
-              <h1 className="font-display-lg text-white mb-4">The New <br />Standard</h1>
+              <h1 className="font-display-lg text-white mb-4">Effortless<br />Elegance.</h1>
               <Link href="/products?category=fashion">
                 <button className="bg-white text-black px-8 py-3.5 rounded-xl font-label-md hover:bg-primary-container hover:text-white transition-all duration-300 active:scale-95 shadow-lg">Explore Collection</button>
               </Link>
@@ -66,9 +66,9 @@ export default function Home() {
               style={{ y: y2, backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAogO9w9FGXtQ5_ueTVMaY9Na3X2_URRO5zqqRVwd0KkzZG3NkzviHo_Idw5_1l1oXHtm8CP2-jok1K90zuX6CK_B42NlUtTiJcfwxfjoOgc09jWcL-_ZZMsqQ6M7aNlaoYywD__XwXyfMhmmgwTS1k65vsZlAhiViLl4IbU5oXMjcEO-vG-fTG2xpKGLTQfMY6n9CBeW-0wkh7TldqfRzf-nW8_tdkpW8yXD3_cPYBzm1rgEKdW4Pd')" }}
             ></motion.div>
             <div className="absolute inset-y-0 left-8 flex flex-col justify-center z-20">
-              <span className="text-white/80 font-label-md text-[10px] tracking-widest uppercase mb-1">Tech</span>
-              <h2 className="font-headline-xl text-white">Precision Gear</h2>
-              <Link href="/products?category=tech" className="text-white font-label-md underline underline-offset-8 mt-2 hover:text-primary-fixed transition-colors">Shop Tech</Link>
+              {/* <span className="text-white/80 font-label-md text-[10px] tracking-widest uppercase mb-1">Tech</span> */}
+              <h2 className="font-headline-xl text-white">Elevated Everyday.</h2>
+              <Link href="/products?category=tech" className="text-white font-label-md underline underline-offset-8 mt-2 hover:text-primary-fixed transition-colors">Explore Essentials</Link>
             </div>
           </div>
 
@@ -83,8 +83,11 @@ export default function Home() {
               style={{ y: y3, backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAMIlOSJ-S3DfXE-j911pCpmUNRzybO7vqYhVUOGfITb6LY4z2ZDAXERcI1DDqicxgk8KtzlZZvUHx32H1UnWVA7W6QI8Gvvxwxiir0iWbbgf9lo5LOkgEvzpfiyZcwADXabTBFU2y83_-ovZ4WihZXOCJ-ZhKCguK7_xvQJaaDVrVCbjKB4YYgxXyBYTYX2st8aSOe-ARW-20QnoikN7qrpzam9QQvqbAxidVt1c5Gw6tmmn8LCzRb')" }}
             ></motion.div>
             <div className="absolute top-8 right-8 text-right z-20">
-              <span className="text-white font-label-md text-[10px] tracking-widest uppercase mb-1 block">Accessories</span>
-              <h2 className="font-headline-xl text-white">Curated Details</h2>
+              {/* <span className="text-white font-label-md text-[10px] tracking-widest uppercase mb-1 block">Accessories</span> */}
+              <h2 className="font-headline-xl text-white">The Finishing Touch</h2>
+              <Link href="/products?category=accessories">
+                <button className="bg-white text-black px-8 py-3.5 rounded-xl font-label-md hover:bg-primary-container hover:text-white transition-all duration-300 active:scale-95 shadow-lg">Explore Accessories</button>
+              </Link>
             </div>
           </div>
         </div>
@@ -98,7 +101,7 @@ export default function Home() {
           viewport={{ once: true }}
           className="font-display-sm text-on-surface mb-8"
         >
-          Redefining the baseline.
+          Curated for the Modern Wardrobe & Lifestyle.
         </motion.h2>
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
@@ -107,32 +110,32 @@ export default function Home() {
           transition={{ delay: 0.1 }}
           className="font-body-lg text-on-surface-variant text-xl md:text-2xl leading-relaxed"
         >
-          We architect artifacts that bridge the gap between high-performance technology and high-fashion aesthetics. Uncompromising material quality combined with silent, seamless utility.
+          We bring together timeless style, exceptional craftsmanship, and everyday versatility. Every piece in our catalog is handpicked for superior quality, enduring comfort, and effortless sophistication.
         </motion.p>
       </section>
 
       {/* Featured Categories - Sticky Overlap */}
       <section className="relative mx-auto mb-20 max-w-[1440px] px-4 md:px-6 py-8 md:mb-32">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between md:mb-12">
-          <h2 className="font-headline-xl text-on-surface text-3xl md:text-5xl">Explore by Discipline</h2>
+          <h2 className="font-headline-xl text-on-surface text-3xl md:text-5xl">THE NOVARIX EDIT</h2>
         </div>
         
         <div className="flex flex-col gap-8 relative">
           {[
             { 
-              title: "Technology", 
+              title: "Signature Details", 
               img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAogO9w9FGXtQ5_ueTVMaY9Na3X2_URRO5zqqRVwd0KkzZG3NkzviHo_Idw5_1l1oXHtm8CP2-jok1K90zuX6CK_B42NlUtTiJcfwxfjoOgc09jWcL-_ZZMsqQ6M7aNlaoYywD__XwXyfMhmmgwTS1k65vsZlAhiViLl4IbU5oXMjcEO-vG-fTG2xpKGLTQfMY6n9CBeW-0wkh7TldqfRzf-nW8_tdkpW8yXD3_cPYBzm1rgEKdW4Pd", 
               link: "/products?category=tech",
               bgPos: "bg-center"
             },
             { 
-              title: "Fashion", 
+              title: "Timeless Apparel",
               img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCX3F2C5aka18RZtJ5yd0KTYBdvMe5_MfVP3oGZUOoPNZZbiBz1rEf_GKz6xuqbhcDD7dppvssJtqkHbIsIkEXAjhgn3aZYWtNJFH2zli46um0RS_amfF07Vht4yWURf0PcAV2nezBDOctbWn4N6xdZNGhsPUILKIlFR5TGIC7FD5u5o9CEyEKS1ZsZAzt7PeCUvXzSSHSQQ2xcK1ZG9_8zIY4zpja8zjB-FshWasieAJrAQVUm-DhX", 
               link: "/products?category=fashion",
               bgPos: "bg-[center_top]"
             },
             { 
-              title: "Accessories", 
+              title: "Modern Essentials", 
               img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAMIlOSJ-S3DfXE-j911pCpmUNRzybO7vqYhVUOGfITb6LY4z2ZDAXERcI1DDqicxgk8KtzlZZvUHx32H1UnWVA7W6QI8Gvvxwxiir0iWbbgf9lo5LOkgEvzpfiyZcwADXabTBFU2y83_-ovZ4WihZXOCJ-ZhKCguK7_xvQJaaDVrVCbjKB4YYgxXyBYTYX2st8aSOe-ARW-20QnoikN7qrpzam9QQvqbAxidVt1c5Gw6tmmn8LCzRb", 
               link: "/products?category=accessories",
               bgPos: "bg-center"
@@ -173,8 +176,8 @@ export default function Home() {
           className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between md:mb-16"
         >
           <div>
-            <h2 className="font-headline-xl text-on-surface text-3xl md:text-5xl">Trending Now</h2>
-            <p className="text-on-surface-variant font-body-md mt-2">Highly-coveted pieces curated for this week.</p>
+            <h2 className="font-headline-xl text-on-surface text-3xl md:text-5xl">Most Coveted</h2>
+            <p className="text-on-surface-variant font-body-md mt-2">Signature pieces loved by our community this season.</p>
           </div>
           <Link href="/products" className="font-label-md text-primary flex items-center gap-2 hover:gap-3 transition-all duration-300 group">
             View All <span className="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
@@ -301,10 +304,10 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <span className="font-label-md text-primary uppercase tracking-[0.3em] mb-6 block">The Inner Circle</span>
-            <h2 className="font-display-sm text-on-surface mb-6 text-4xl md:text-5xl">Unparalleled access.</h2>
+            <span className="font-label-md text-primary uppercase tracking-[0.3em] mb-6 block">Join Membership</span>
+            <h2 className="font-display-sm text-on-surface mb-6 text-4xl md:text-5xl">Novarix Circle</h2>
             <p className="font-body-lg text-on-surface-variant mb-12 text-lg md:text-xl max-w-2xl mx-auto">
-              Join the LUXE private registry to unlock early access to our seasonal drops, exclusive members-only hardware, and curated architectural insights.
+              Join our private member list for early access to new seasonal edits, member only pricing, and priority rewards on every order.
             </p>
             <form className="flex flex-col sm:flex-row gap-4 justify-center max-w-[512px] mx-auto" onSubmit={(e) => { e.preventDefault(); toast.success('Welcome to the inner circle.'); }}>
               <input 

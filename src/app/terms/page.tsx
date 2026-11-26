@@ -10,7 +10,7 @@ export default function TermsPage() {
           Terms of Service
         </h1>
         <p className="text-sm text-on-surface-variant">
-          Last revised: November 2026 · Governing Law: Karnataka, India
+          Last revised: November 2026
         </p>
       </div>
 
@@ -68,8 +68,8 @@ export default function TermsPage() {
         </section>
 
         <div className="bg-surface-container-low p-5 rounded-2xl border border-outline-variant/30 text-sm">
-          <p className="font-semibold text-on-surface mb-1">Questions or Disputes?</p>
-          <p>Reach out to our customer resolution desk at <a href="mailto:support@novarixshop.tech" className="text-primary hover:underline">support@novarixshop.tech</a> or call +91 (80) 4123-4567.</p>
+          {/* <p className="font-semibold text-on-surface mb-1">Questions or Disputes?</p>
+          <p>Reach out to our customer resolution desk at <a href="mailto:support@novarixshop.tech" className="text-primary hover:underline">support@novarixshop.tech</a> or call +91 (80) 4123-4567.</p> */}
         </div>
       </div>
     </div>

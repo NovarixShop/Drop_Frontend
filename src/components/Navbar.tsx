@@ -70,18 +70,18 @@ export default function Navbar() {
             <Image
               src="/logo-dark.png"
               alt="NOVARIX"
-              width={160}
-              height={50}
+              width={180}
+              height={28}
               priority
-              className="h-10 md:h-12 w-auto object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
+              className="h-6 md:h-7 w-auto object-contain hidden dark:block transition-transform duration-200 group-hover:scale-105"
             />
             <Image
               src="/logo-light.png"
               alt="NOVARIX"
-              width={160}
-              height={50}
+              width={180}
+              height={28}
               priority
-              className="h-10 md:h-12 w-auto object-contain block dark:hidden transition-transform duration-200 group-hover:scale-105"
+              className="h-6 md:h-7 w-auto object-contain block dark:hidden transition-transform duration-200 group-hover:scale-105"
             />
           </Link>
           <div className="hidden md:flex items-center gap-5 lg:gap-7">
